@@ -73,7 +73,7 @@ class Webserver():
                 ['GET']
             ),
             WebserverRoute(
-                '/static/trails/<url>',
+                '/trails/<trail_csv>',
                 'get_trail_csv',
                 self.get_trail_csv,
                 ['GET']
@@ -105,10 +105,10 @@ class Webserver():
                 methods=route.methods
             )
 
-    async def get_trail_csv(self, url):
+    async def get_trail_csv(self, trail_csv):
         """ Function to get the trail csv """
         try:
-            return await send_file(f"trails/{url}")
+            return await send_file(f"trails/{trail_csv}")
         except FileNotFoundError:
             return "No trail found!"
 
