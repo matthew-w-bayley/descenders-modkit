@@ -433,7 +433,7 @@ namespace ModLoaderSolution
                 {
 					GameObject trailParent = new GameObject();
 					Trail tr = trailParent.AddComponent<Trail>();
-					tr.LoadFromUrl("https://modkit.nohumanman.com/static/trails/" + url);
+					tr.LoadFromUrl("https://modkit.nohumanman.com/api/trails/" + url);
 				}
 			}
 			if (message.StartsWith("SPLIT_TIME"))
