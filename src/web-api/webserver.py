@@ -73,6 +73,12 @@ class Webserver():
                 ['GET']
             ),
             WebserverRoute(
+                '/static/trails/<url>',
+                'get_trail_csv',
+                self.get_trail_csv,
+                ['GET']
+            ),
+            WebserverRoute(
                 '/get-total-stored-times',
                 'get_total_stored_times',
                 self.get_total_stored_times,
@@ -98,6 +104,13 @@ class Webserver():
                 view_func=route.view_func,
                 methods=route.methods
             )
+
+    async def get_trail_csv(self, url):
+        """ Function to get the trail csv """
+        try:
+            return await send_file(f"trails/{url}")
+        except FileNotFoundError:
+            return "No trail found!"
 
     async def upload_replay(self):
         """ Function to upload a replay to the server """
