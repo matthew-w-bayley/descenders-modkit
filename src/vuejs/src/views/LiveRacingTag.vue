@@ -1,13 +1,19 @@
 <template>
     <v-container fluid class="fill-height">
-      <v-row align="center" justify="center">
+      <v-row align="left" justify="left">
         <v-col cols="auto">
-          <h1 class="text-h3">{{spectatedPlayer}}</h1>
+          <h1 class="text-h3 tag-format">{{spectatedPlayer}}</h1>
         </v-col>
       </v-row>
     </v-container>
   </template>
   
+  <style>
+    .tag-format{
+      font-size: 20px;
+      font-weight: bold;
+    }
+  </style>
 
   <script>
     export default {
