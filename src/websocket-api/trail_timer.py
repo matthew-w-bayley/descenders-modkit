@@ -2,12 +2,13 @@
 from typing import TYPE_CHECKING
 import dataclasses
 import time
+import requests
 import logging
 import asyncio
 import os
 import nest_asyncio # Used to fix RuntimeError in using async from thread
 from twitch_chat_irc import twitch_chat_irc
-from tokens import TWITCH_TOKEN
+from tokens import TWITCH_TOKEN, DISCORD_WEBHOOK
 nest_asyncio.apply()
 
 if TYPE_CHECKING: # for imports with intellisense
@@ -271,8 +272,14 @@ class TrailTimer():
                     connection = twitch_chat_irc.TwitchChatIRC('nohumanman', TWITCH_TOKEN)
                     connection.send("bbb171", f"{secs_str} 🚴‍♂️💨") # change to send to self.network_player.info.twitch_channel
                     # this should serve as a log of times
-                    time_url = f"https://modkitv2.nohumanman.com/time/{time_id}"
+                    time_url = f"https://modkit.nohumanman.com/time/{time_id}"
                     connection.send("bbb171", f"{time_url}")
+                    # send to discord webhook
+                    data = {
+                        "content": f"[{secs_str}]({time_url}) 🚴‍♂️💨",
+                        "username": "Descenders Modkit"
+                    }
+                    requests.post(DISCORD_WEBHOOK, json = data)
             except Exception as e:
                 logging.error(f"Failed to send message to twitch chat: {e}")
         asyncio.create_task(twitch_notif())
