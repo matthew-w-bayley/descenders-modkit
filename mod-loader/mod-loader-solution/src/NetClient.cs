@@ -25,9 +25,9 @@ namespace ModLoaderSolution
 		List<string> messages = new List<string>();
 		public int port = 65433;
 		public string ip = "86.26.185.112";
-		static string version = "0.4.00";
+		static string version = "0.4.05";
 		static bool quietUpdate = false;
-		static string patchNotes = "You are now using Modkit V2. This is the first stable release of the modkit. If you have any problems, please report them ASAP.\n\n\nYours,\n- nohumanman"; // that which has changed since the last version.
+		static string patchNotes = "This version contains a hotfix for replays failing to upload. Some previous times may not be verifiable due to this error. Hopefully this bug is resolved.\n\n\nYours,\n- nohumanman"; // that which has changed since the last version.
 		public static DebugType debugState = DebugType.RELEASE;
         [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeAnalysis", "IDE0051:Unused member", Justification = "Called by Unity DI")]
         void Awake(){
@@ -184,62 +184,55 @@ namespace ModLoaderSolution
 			}
 			Utilities.LogMethodCallEnd();
 		}
-		public IEnumerator UploadReplay(string replay, string time_id)
-        {
-			Utilities.LogMethodCallStart();
+		public void UploadReplay(string replay, string time_id)
+		{
 			Byte[] bytes = System.IO.File.ReadAllBytes(replay);
+			string base64Replay = Convert.ToBase64String(bytes);
 
-			WWWForm form = new WWWForm();
-			form.AddField("time_id", time_id);
-			form.AddBinaryData("replay", bytes, "replay");
-
-			using (UnityWebRequest www = UnityWebRequest.Post(
-				"https://modkitv2.nohumanman.com/api/upload-replay",
-				form
-			))
-			{
-				yield return www.SendWebRequest();
-
-				if (www.isNetworkError || www.isHttpError)
-				{
-					// give it another go
-					UploadReplay(replay, time_id);
-				}
-				else
-				{
-					Utilities.Log("Upload complete!");
-					File.Delete(replay);
-				}
-			}
-			Utilities.LogMethodCallEnd();
+			string message = $"UPLOAD_REPLAY|{time_id}|{base64Replay}\n";
+			_SendData(message);
 		}
-		private void ListenForData() {
-			Utilities.LogMethodCallStart();
-			try {
-				Utilities.Log("Creating TcpClient()");
-				socketConnection = new TcpClient(ip, port);
-				Utilities.Log("TcpClient created!");
-				Byte[] bytes = new Byte[1024];
-				while (true) {
-					using (NetworkStream stream = socketConnection.GetStream()) { 					
-						int length; 								
-						while ((length = stream.Read(bytes, 0, bytes.Length)) != 0) { 						
-							var incommingData = new byte[length]; 						
-							Array.Copy(bytes, 0, incommingData, 0, length); 						
-							string serverMessage = Encoding.ASCII.GetString(incommingData);
-							string[] serverMessages = serverMessage.Split('\n');
-							foreach(string message in serverMessages)
-								messages.Add(message);
-						}
-					}
-				}
-			}
-			catch {             
-				Utilities.Log("Socket exception in ListenForData()");         
-			}
-			Utilities.LogMethodCallEnd();
-		}
-		public void NetStart()
+        private void ListenForData()
+        {
+            try
+            {
+                Utilities.Log("Creating TcpClient()");
+                socketConnection = new TcpClient(ip, port);
+                Utilities.Log("TcpClient created!");
+                Byte[] bytes = new Byte[1024];
+                StringBuilder dataBuffer = new StringBuilder();
+
+                using (NetworkStream stream = socketConnection.GetStream())
+                {
+                    int length;
+                    while ((length = stream.Read(bytes, 0, bytes.Length)) != 0)
+                    {
+                        string receivedData = Encoding.ASCII.GetString(bytes, 0, length);
+                        dataBuffer.Append(receivedData);
+
+                        // Process complete messages
+                        while (true)
+                        {
+                            int newlineIndex = dataBuffer.ToString().IndexOf('\n');
+                            if (newlineIndex == -1)
+                                break; // No complete message yet, wait for more data
+
+                            string completeMessage = dataBuffer.ToString(0, newlineIndex);
+                            messages.Add(completeMessage);
+
+                            // Remove processed message from buffer
+                            dataBuffer.Remove(0, newlineIndex + 1);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                Utilities.Log("Socket exception in ListenForData()");
+            }
+        }
+
+        public void NetStart()
         {
 			Utilities.LogMethodCallStart();
 			PlayerManagement.Instance.NetStart();
@@ -266,12 +259,23 @@ namespace ModLoaderSolution
 			if (message.StartsWith("UPLOAD_REPLAY"))
             {
 				string time_id = message.Split('|')[1];
-				Utilities.instance.SaveReplayToFile(time_id);
+
 				string replayLocation = (
-					Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
-					+ "Low\\RageSquid\\Descenders\\Replays\\" + time_id + ".replay"
-				);
-				StartCoroutine(UploadReplay(replayLocation, time_id));
+					Application.persistentDataPath + "/Replays/"
+					 + time_id + ".replay"
+                );
+				if (!File.Exists(replayLocation)){
+                    // if replay doesn't exist then save it
+                    Utilities.instance.SaveReplayToFile(time_id);
+					if (!File.Exists(replayLocation))
+					{
+						// critical error
+						Utilities.instance.PopUp("Critical Error", "Replay failed to save, please report this in the Descenders Competitive server with your output-log.txt!");
+						SendData("LOG_TO_PRINT", "Critical Error, replay failed to save in '" + replayLocation + "'");
+					}
+                }
+				// upload replay
+                UploadReplay(replayLocation, time_id);
 			}
 			if (message.StartsWith("GET_POS"))
             {
@@ -429,7 +433,7 @@ namespace ModLoaderSolution
                 {
 					GameObject trailParent = new GameObject();
 					Trail tr = trailParent.AddComponent<Trail>();
-					tr.LoadFromUrl("https://modkit.nohumanman.com/static/trails/" + url);
+					tr.LoadFromUrl("https://modkit.nohumanman.com/api/trails/" + url);
 				}
 			}
 			if (message.StartsWith("SPLIT_TIME"))

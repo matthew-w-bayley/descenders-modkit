@@ -2,12 +2,13 @@
 from typing import TYPE_CHECKING
 import dataclasses
 import time
+import requests
 import logging
 import asyncio
 import os
 import nest_asyncio # Used to fix RuntimeError in using async from thread
 from twitch_chat_irc import twitch_chat_irc
-from tokens import TWITCH_TOKEN
+from tokens import TWITCH_TOKEN, DISCORD_WEBHOOK
 nest_asyncio.apply()
 
 if TYPE_CHECKING: # for imports with intellisense
@@ -204,18 +205,20 @@ class TrailTimer():
                 return (False, error_message)
         return (True, "No errors")
 
-    async def request_replay(self, time_id):
+    async def request_replay(self, time_id, retries=3):
         """ Request the replay from the client. """
         # send the replay request to the client
         await self.network_player.send(f"UPLOAD_REPLAY|{time_id}")
         # check if the replay was uploaded
-        asyncio.sleep(20)
+        await asyncio.sleep(20)
         # ./replays/{time_id}.replay
         replay_path = f"./replays/{time_id}.replay"
-        if not os.path.exists(replay_path):
-            # if the replay was not uploaded, invalidate the time
-            print("Replay was not uploaded! Deleting time.", flush=True)
-            await self.network_player.dbms.delete_time(time_id)
+        if not os.path.exists(replay_path) and retries > 0:
+            # if the replay was not uploaded, we need to request the replay again
+            await self.request_replay(time_id, retries - 1)
+        elif not os.path.exists(replay_path):
+            # if the replay was not uploaded after retries, invalidate the timer
+            await self.invalidate_timer("Replay not uploaded after multiple attempts")
 
     async def end_timer(self, client_time: float):
         """ End the timer. """
@@ -270,6 +273,13 @@ class TrailTimer():
                     connection.send("bbb171", f"{secs_str} 🚴‍♂️💨") # change to send to self.network_player.info.twitch_channel
                     # this should serve as a log of times
                     time_url = f"https://modkit.nohumanman.com/time/{time_id}"
+                    connection.send("bbb171", f"{time_url}")
+                    # send to discord webhook
+                    data = {
+                        "content": f"[{secs_str}]({time_url}) 🚴‍♂️💨",
+                        "username": "Descenders Modkit"
+                    }
+                    requests.post(DISCORD_WEBHOOK, json = data)
             except Exception as e:
                 logging.error(f"Failed to send message to twitch chat: {e}")
         asyncio.create_task(twitch_notif())

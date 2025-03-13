@@ -218,14 +218,21 @@ class DBMS:
     
     async def get_time(self, time_id):
         async with self.async_session() as session:
-            time = await session.get(PlayerTime, time_id)
+            # get from alltimes
+            query = select(AllTimes).where(AllTimes.player_time_id == time_id)
+            result = await session.execute(query)
+            time = result.scalar_one_or_none()
+            
             return {
                 "starting_speed": time.starting_speed,
                 "name": (await session.get(Player, time.steam_id)).steam_name,
                 "bike": time.bike_id,
                 "version": time.version,
-                "time_id": time.player_time_id,
-                "time": time.submission_timestamp,
+                "time_id": str(time.player_time_id),
+                "submission_timestamp": time.submission_timestamp,
+                "time": time.final_time,
+                "verified": time.verified,
+                "deleted": time.deleted
             }
 
     async def submit_time_verification(
