@@ -1,8 +1,5 @@
-<a target="_blank" href="https://modkit.nohumanman.com/"><img src="server\src\static\images\Descenders Competitive Logo.png" align="right" height=100/></a>
-
 # Descenders Modkit
 
-[![Python application][python-application-svg-url]][python-application-url]
 [![Release ModLoaderSolution](https://github.com/nohumanman/descenders-modkit/actions/workflows/dotnet-release.yml/badge.svg)](https://github.com/nohumanman/descenders-modkit/actions/workflows/dotnet-release.yml)
 [![License: GPL v3][gpg-license-svg-url]][gpg-license-url]
 
