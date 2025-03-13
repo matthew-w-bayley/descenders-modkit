@@ -46,6 +46,9 @@ BI0S0CK](https://mod.io/g/descenders/u/bi0s0ck)*
 - **[MTR BMX Track](https://mod.io/g/descenders/m/mtr-bmx-track)** by *[dragonkiller37](https://mod.io/g/descenders/u/dragonkiller37)*
 - **[Fort William 4x](https://mod.io/g/descenders/m/fort-william-4x)** by *[BBB171](https://mod.io/g/descenders/u/bbb1711)*
 - **[50to01 Line](https://mod.io/g/descenders/m/50to01-line)** by *[antgrass](https://mod.io/g/descenders/u/antgrass)*
+- **[Alpine DH](https://mod.io/g/descenders/m/alpine-dh)** by *[flysix](https://mod.io/g/descenders/u/flysix)*
+- **[Dyfi Bikepark](https://mod.io/g/descenders/m/dyfi-bikepark)** by *[wiking2888](https://mod.io/g/descenders/u/wiking2888)*
+- **[BC Bikepark](https://mod.io/g/descenders/m/bc-bikepark)** by *[linus1005](https://mod.io/g/descenders/u/linus1005)*
 
 Some maps don't have timers and only use the modkit for features it provides (e.g. bike switcher).
 
