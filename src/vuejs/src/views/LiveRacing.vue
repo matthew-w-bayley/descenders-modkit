@@ -13,6 +13,7 @@
             <v-card-actions>
               <v-btn @click='sendEval(user)'>Send</v-btn>
               <v-btn @click="spectatePlayer(user)">SPECTATE</v-btn>
+              <v-btn @click="user.eval = 'BANNED|CLOSE'; sendEval(user)">CLOSE</v-btn>
               <v-btn disabled @click="report = !report" icon class="position-absolute top-0 right-0" color="orange" v-bind="attrs" v-on="on"><v-icon>mdi-flag</v-icon></v-btn>
             </v-card-actions>
           </v-card>
