@@ -30,9 +30,13 @@ class VuejsSocketServer:
             'total_users_online': lambda: len(self.web_socket.players),
             'total_stored_times': self.dbms.get_total_stored_times,
             'total_replay_size': self.get_total_replay_size,
-            'times_submitted_past_30_days': self.get_times_past_30_days
+            'times_submitted_past_30_days': self.get_times_past_30_days,
+            'time': self.get_time
         }
     
+    async def get_time(self, time_id):
+        return await self.dbms.get_time(int(time_id))
+
     def get_total_replay_size(self):
         # get size of ./replays
         size = 0
@@ -105,7 +109,12 @@ class VuejsSocketServer:
                 "world_name": player.info.world_name,
                 "last_trick": player.info.last_trick,
                 "time_started": player.info.time_started,
-                "trails": str([{player.trails[trail].trail_name} for trail in player.trails]),
+                "trails": str([{
+                    "trail_name": player.trails[trail].trail_name,
+                    "started": player.trails[trail].timer_info.started,
+                    "time_started": player.trails[trail].timer_info.time_started,
+                    "times": player.trails[trail].timer_info.times,
+                } for trail in player.trails]),
                 "version": player.info.version,
                 "spectating": player.info.spectating,
                 "spectating_id": player.info.spectating_id,
@@ -118,7 +127,7 @@ class VuejsSocketServer:
                 ident = data['identifier']
                 func = self.identifiers[ident]
                 if asyncio.iscoroutinefunction(func):
-                    res = await func()
+                    res = await func(data['data']) if 'data' in data else await func()
                 else:
                     res = func()
                 await self.sio.emit('message', json.dumps({

@@ -55,7 +55,6 @@
       })
       this.$socket.on('message', (data) => {
         console.log('Message from server:', data);
-
             var data_json = JSON.parse(data);
             if (data_json['type'] == 'send'){
                 if (data_json['identifier'] == 'steam_id'){
@@ -63,7 +62,6 @@
                     localStorage.setItem("steam_id", data_json['data']);
                 }
             }
-
       });
       this.$socket.emit('message', 'get_users');
       setInterval(() => {

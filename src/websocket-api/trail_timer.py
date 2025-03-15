@@ -205,18 +205,20 @@ class TrailTimer():
                 return (False, error_message)
         return (True, "No errors")
 
-    async def request_replay(self, time_id):
+    async def request_replay(self, time_id, retries=3):
         """ Request the replay from the client. """
         # send the replay request to the client
         await self.network_player.send(f"UPLOAD_REPLAY|{time_id}")
         # check if the replay was uploaded
-        asyncio.sleep(20)
+        await asyncio.sleep(20)
         # ./replays/{time_id}.replay
         replay_path = f"./replays/{time_id}.replay"
-        if not os.path.exists(replay_path):
-            # if the replay was not uploaded, invalidate the time
-            print("Replay was not uploaded! Deleting time.", flush=True)
-            await self.network_player.dbms.delete_time(time_id)
+        if not os.path.exists(replay_path) and retries > 0:
+            # if the replay was not uploaded, we need to request the replay again
+            await self.request_replay(time_id, retries - 1)
+        elif not os.path.exists(replay_path):
+            # if the replay was not uploaded after retries, invalidate the timer
+            await self.invalidate_timer("Replay not uploaded after multiple attempts")
 
     async def end_timer(self, client_time: float):
         """ End the timer. """

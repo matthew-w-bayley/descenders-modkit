@@ -65,7 +65,7 @@ class WebsiteUser(Base):
 class AllTimes(Base):
     __tablename__ = 'all_times'
     
-    player_time_id = Column(Integer, primary_key=True)
+    player_time_id = Column(BigInteger, primary_key=True)
     steam_id = Column(String, nullable=False)
     submission_timestamp = Column(TIMESTAMP, nullable=False)
     trail_id = Column(Integer, nullable=False)
