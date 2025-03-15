@@ -76,8 +76,9 @@ export default {
 
   methods: {
     async loadItems({ page, itemsPerPage, sortBy }) {
-      // Abort previous request if it exists
+      // Cancel previous request if it exists
       if (this.abortController) {
+        console.log("Aborting previous request...");
         this.abortController.abort();
       }
 
@@ -88,12 +89,17 @@ export default {
       this.loading = true;
 
       try {
+        console.log("Fetching data...");
         const { items, total } = await this.fetchItems({ page, itemsPerPage, sortBy, signal });
-        this.serverItems = items;
-        this.totalItems = total;
+
+        // Only update if this request wasn't aborted
+        if (!signal.aborted) {
+          this.serverItems = items;
+          this.totalItems = total;
+        }
       } catch (error) {
         if (error.name === "AbortError") {
-          console.log("Previous request aborted");
+          console.log("Request aborted, ignoring response.");
         } else {
           console.error("Error fetching data:", error);
         }
@@ -110,11 +116,15 @@ export default {
         order: sortBy.length ? (sortBy[0].order === 'desc' ? 'desc' : 'asc') : '',
       });
 
+      console.log("API Call:", `${apiUrl}/get-all-times?${params.toString()}`);
+
       const resp = await fetch(`${apiUrl}/get-total-stored-times`, { signal });
       const num_tot = await resp.json();
 
       const response = await fetch(`${apiUrl}/get-all-times?${params.toString()}`, { signal });
       const data = await response.json();
+
+      console.log("Fetched items:", data.length);
 
       return { items: data, total: num_tot };
     },
@@ -135,4 +145,5 @@ export default {
     },
   },
 };
+
 </script>
