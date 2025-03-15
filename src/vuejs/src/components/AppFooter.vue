@@ -15,11 +15,10 @@
       />
     </a>
 
-    <div
-      class="text-caption text-disabled"
-      style="position: absolute; right: 16px;"
-    >
-      &copy; 2020-{{ (new Date()).getFullYear() }} <span class="d-none d-sm-inline-block">Matthew Bayley</span>      
+    <div class="text-caption text-disabled" style="position: absolute; right: 16px;">
+      <a href="/privacy-policy" class="mx-2">Privacy Policy</a> | 
+      <a href="/terms-of-service" class="mx-2">Terms of Service</a>
+      &copy; 2020-{{ new Date().getFullYear() }} <span class="d-none d-sm-inline-block">Matthew Bayley</span>      
     </div>
   </v-footer>
 </template>
