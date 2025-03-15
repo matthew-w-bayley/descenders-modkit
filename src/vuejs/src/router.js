@@ -7,6 +7,8 @@ import LiveRacingTime from './views/LiveRacingTime.vue';
 import TimeDatabase from './views/TimeDatabase.vue';
 import Callback from './views/Callback.vue'
 import Time from './views/Time.vue';
+import TermsOfService from './views/TermsOfService.vue';
+import PrivacyPolicy from './views/PrivacyPolicy.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: Home, inHomeBar: false },
@@ -17,6 +19,8 @@ const routes = [
   { path: '/live-racing/spectated-player/', name: 'Spectated Player', component: LiveRacingTag, inHomeBar: false},
   { path: '/time/:time_id', name: 'Time', component: Time, inHomeBar: false },
   { path: '/live-racing/spectated-player-time', name: 'Live Racing Time', component: LiveRacingTime, inHomeBar: false },
+  { path: '/legal/terms-of-service/', name: 'Terms of Service', component: TermsOfService, inHomeBar: false},
+  { path: '/legal/privacy-policy/', name: 'Privacy Policy', component: PrivacyPolicy, inHomeBar: false}
 ];
 
 const router = createRouter({
