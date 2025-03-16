@@ -205,6 +205,44 @@ class TestDbms(unittest.IsolatedAsyncioTestCase):
             }
         ])
     
+    async def test_get_leaderboard_large(self):
+        dbms_instance = await self.get_dbms_instance()
+        # manually insert because submit_time uses time.time() which is not deterministic
+        conn = self.connect()
+        cur = conn.cursor()
+        cur.execute("INSERT INTO trails (trail_id, trail_name, world_name) VALUES (0, 'Test Trail', 'Test World')")
+        for i in range(50):
+            steam_id = f"765611980000000{i:02d}"
+            cur.execute(f"INSERT INTO players (steam_id, steam_name) VALUES ('{steam_id}', 'test_player{i}')")
+            cur.execute(f"INSERT INTO player_times (player_time_id, steam_id, trail_id, bike_id, starting_speed, version, submission_timestamp, deleted) VALUES ({i + 1}, '{steam_id}', 0, 1, 8.34, '1.34', {i}, FALSE)")
+            cur.execute(f"INSERT INTO checkpoint_times (player_time_id, checkpoint_num, checkpoint_time) VALUES ({i + 1}, 1, {i})")
+            cur.execute(f"INSERT INTO verifications (player_time_id, verified) VALUES ({i + 1}, TRUE)")
+        conn.commit()
+        leaderboard = await dbms_instance.get_leaderboard("Test Trail", "Test World", num=50)
+        self.assertEqual(len(leaderboard), 50)
+        for i in range(50):
+            self.assertEqual(leaderboard[i]["time_id"], i + 1)
+            self.assertEqual(leaderboard[i]["time"], i)
+
+    async def test_get_leaderboard_large(self):
+        import random
+        dbms_instance = await self.get_dbms_instance()
+        # manually insert because submit_time uses time.time() which is not deterministic
+        conn = self.connect()
+        cur = conn.cursor()
+        cur.execute("INSERT INTO trails (trail_id, trail_name, world_name) VALUES (0, 'Test Trail', 'Test World')")
+        for i in range(50):
+            steam_id = f"765611980000000{i:02d}"
+            cur.execute(f"INSERT INTO players (steam_id, steam_name) VALUES ('{steam_id}', 'test_player{i}')")
+            cur.execute(f"INSERT INTO player_times (player_time_id, steam_id, trail_id, bike_id, starting_speed, version, submission_timestamp, deleted) VALUES ({i + 1}, '{steam_id}', 0, 1, 8.34, '1.34', {i}, FALSE)")
+            cur.execute(f"INSERT INTO checkpoint_times (player_time_id, checkpoint_num, checkpoint_time) VALUES ({i + 1}, 1, {random.randint(0, 30)})")
+            cur.execute(f"INSERT INTO verifications (player_time_id, verified) VALUES ({i + 1}, TRUE)")
+        conn.commit()
+        leaderboard = await dbms_instance.get_leaderboard("Test Trail", "Test World", num=50)
+        self.assertEqual(len(leaderboard), 50)
+        # check to see if leaderboard is in order
+        self.assertTrue(all(leaderboard[i]["time"] <= leaderboard[i + 1]["time"] for i in range(len(leaderboard) - 1)))
+
     async def test_delete_time(self):
         dbms_instance = await self.get_dbms_instance()
         # manually insert because submit_time uses time.time() which is not deterministic
@@ -560,7 +598,7 @@ class TestDbms(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(recent_times[0]["submission_timestamp"], 19)
         self.assertEqual(recent_times[9]["submission_timestamp"], 10)
 
-    async def test_get_trail_average_starting_speed(self):
+    async def test_get_trail_max_starting_speed(self):
         dbms_instance = await self.get_dbms_instance()
         # manually insert because submit_time uses time.time() which is not deterministic
         conn = self.connect()
@@ -574,9 +612,61 @@ class TestDbms(unittest.IsolatedAsyncioTestCase):
         # insert verification
         cur.execute("INSERT INTO verifications (player_time_id, verified) VALUES (1, TRUE)")
         conn.commit()
-        trail_average_starting_speed = await dbms_instance.get_trail_average_starting_speed("Test Trail", "Test World")
+        trail_average_starting_speed = await dbms_instance.get_trail_max_starting_speed("Test Trail", "Test World")
         self.assertEqual(trail_average_starting_speed, 8.34)
     
+    async def test_trail_max_starting_speed_with_unverified(self):
+        dbms_instance = await self.get_dbms_instance()
+        # manually insert because submit_time uses time.time() which is not deterministic
+        conn = self.connect()
+        cur = conn.cursor()
+        # insert trail
+        cur.execute("INSERT INTO trails (trail_id, trail_name, world_name) VALUES (0, 'Test Trail', 'Test World')")
+        # insert player
+        cur.execute("INSERT INTO players (steam_id, steam_name) VALUES ('76561198000000000', 'test_player')")
+        # insert time
+        cur.execute("INSERT INTO player_times (player_time_id, steam_id, trail_id, bike_id, starting_speed, version, submission_timestamp, deleted) VALUES (1, '76561198000000000', 0, 1, 8.34, '1.34', 0, FALSE)")
+        # insert verification
+        cur.execute("INSERT INTO verifications (player_time_id, verified) VALUES (1, FALSE)")
+        conn.commit()
+        trail_average_starting_speed = await dbms_instance.get_trail_max_starting_speed("Test Trail", "Test World")
+        self.assertEqual(trail_average_starting_speed, 10000000000)
+
+    async def test_trail_max_starting_speed_with_deleted_but_verified(self):
+        dbms_instance = await self.get_dbms_instance()
+        # manually insert because submit_time uses time.time() which is not deterministic
+        conn = self.connect()
+        cur = conn.cursor()
+        # insert trail
+        cur.execute("INSERT INTO trails (trail_id, trail_name, world_name) VALUES (0, 'Test Trail', 'Test World')")
+        # insert player
+        cur.execute("INSERT INTO players (steam_id, steam_name) VALUES ('76561198000000000', 'test_player')")
+        # insert time
+        cur.execute("INSERT INTO player_times (player_time_id, steam_id, trail_id, bike_id, starting_speed, version, submission_timestamp, deleted) VALUES (1, '76561198000000000', 0, 1, 8.34, '1.34', 0, TRUE)")
+        # insert verification
+        cur.execute("INSERT INTO verifications (player_time_id, verified) VALUES (1, TRUE)")
+        conn.commit()
+        trail_average_starting_speed = await dbms_instance.get_trail_max_starting_speed("Test Trail", "Test World")
+        self.assertEqual(trail_average_starting_speed, 10000000000)
+
+    async def test_trail_max_starting_speed_multiple_values(self):
+        dbms_instance = await self.get_dbms_instance()
+        # manually insert because submit_time uses time.time() which is not deterministic
+        conn = self.connect()
+        cur = conn.cursor()
+        # insert trail
+        cur.execute("INSERT INTO trails (trail_id, trail_name, world_name) VALUES (0, 'Test Trail', 'Test World')")
+        # insert player
+        cur.execute("INSERT INTO players (steam_id, steam_name) VALUES ('76561198000000000', 'test_player')")
+        # insert time
+        cur.execute("INSERT INTO player_times (player_time_id, steam_id, trail_id, bike_id, starting_speed, version, submission_timestamp, deleted) VALUES (1, '76561198000000000', 0, 1, 8.34, '1.34', 0, FALSE)")
+        cur.execute("INSERT INTO player_times (player_time_id, steam_id, trail_id, bike_id, starting_speed, version, submission_timestamp, deleted) VALUES (2, '76561198000000000', 0, 1, 23, '1.34', 0, FALSE)")
+        # insert verification
+        cur.execute("INSERT INTO verifications (player_time_id, verified) VALUES (1, TRUE)")
+        conn.commit()
+        trail_average_starting_speed = await dbms_instance.get_trail_max_starting_speed("Test Trail", "Test World")
+        self.assertEqual(trail_average_starting_speed, 23)
+
     async def test_get_trail_average_starting_speed_with_multiple_times(self):
         dbms_instance = await self.get_dbms_instance()
         # manually insert because submit_time uses time.time() which is not deterministic

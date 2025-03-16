@@ -63,24 +63,26 @@ class DBMS:
             result = await session.execute(select(Player))
             return result.scalars().all()
 
-    async def get_trail_id(self, trail_name, world_name):
+    async def get_trail_id(self, trail_name, world_name, version):
         async with self.async_session() as session:
             result = await session.execute(
                 select(Trail).filter_by(
                     trail_name=trail_name,
-                    world_name=world_name)
+                    world_name=world_name,
+                    version=version)
                 )
             trail = result.scalar_one_or_none()
             # If trail does not exist, create it
             if trail is None:
                 trail = Trail(
                     trail_name=trail_name,
-                    world_name=world_name
+                    world_name=world_name,
+                    version=version
                 )
                 session.add(trail)
                 await session.commit()
                 # Return the trail id
-                return await self.get_trail_id(trail_name, world_name) # recursive!
+                return await self.get_trail_id(trail_name, world_name, version) # recursive!
             return trail.trail_id if trail else None
 
     async def submit_time(
@@ -108,7 +110,7 @@ class DBMS:
                 player_time_id=player_time_id,
                 steam_id=steam_id,
                 submission_timestamp=time.time(),
-                trail_id=await self.get_trail_id(trail_name, current_world),
+                trail_id=await self.get_trail_id(trail_name, current_world, version),
                 bike_id=bike_id,
                 starting_speed=starting_speed,
                 version=version,
@@ -192,8 +194,6 @@ class DBMS:
                 query = query.limit(num)
             result = await session.execute(query)
             times = result.scalars().all()
-            # order times by final time
-            times = sorted(times, key=lambda x: x.final_time)
             return [
                 {
                     "place": i + 1,
