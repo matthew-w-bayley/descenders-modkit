@@ -1,8 +1,10 @@
 import unittest
 from unittest.mock import AsyncMock
-from trail_timer import TrailTimer
 import asyncio
 import time
+import importlib
+trail_timer = importlib.import_module('src.websocket-api.trail_timer') # because we have a dash..
+TrailTimer = trail_timer.TrailTimer
 
 # pylint: disable=missing-function-docstring, no-member, attribute-defined-outside-init, line-too-long, protected-access
 

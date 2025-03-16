@@ -19,7 +19,7 @@ Start database with:
 '''
 import unittest
 import time
-from dbms import DBMS
+from src.common.dbms import DBMS
 
 class TestDbms(unittest.IsolatedAsyncioTestCase):
 
@@ -39,7 +39,7 @@ class TestDbms(unittest.IsolatedAsyncioTestCase):
         conn = self.connect()
         cur = conn.cursor()
         cur.execute(drop_all)
-        with open('./server/src/database-schema/schema.sql') as f:
+        with open('./src/db/schema.sql') as f:
             schema = f.read()
             cur.execute(schema)
         conn.commit()
@@ -48,7 +48,6 @@ class TestDbms(unittest.IsolatedAsyncioTestCase):
     async def get_dbms_instance(self):
         self.reset_database()
         dbms_instance = DBMS("postgresql+asyncpg://postgres:postgres@localhost/postgres")
-        await dbms_instance.init_db()
         return dbms_instance
 
     async def test_update_player(self):

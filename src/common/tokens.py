@@ -7,7 +7,7 @@ load_dotenv()
 
 # Tokens for descenders-modkit
 STEAM_API_KEY = os.getenv("STEAM_API_KEY", "")
-WEBHOOK = os.getenv("WEBHOOK", "")
+DISCORD_WEBHOOK = os.getenv("DISCORD_WEBHOOK", "")
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN", "")
 DISCORD_URL = os.getenv("DISCORD_URL", "")
 OAUTH2_CLIENT_ID = os.getenv("OAUTH2_CLIENT_ID", "")

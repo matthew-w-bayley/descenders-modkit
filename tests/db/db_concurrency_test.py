@@ -12,7 +12,7 @@ class TestConcurrency(unittest.TestCase):
         conn = self.connect()
         cur = conn.cursor()
         cur.execute(drop_all)
-        with open('./server/src/database-schema/schema.sql') as f:
+        with open('./src/db/schema.sql') as f:
             schema = f.read()
             cur.execute(schema)
         conn.commit()
@@ -28,6 +28,13 @@ class TestConcurrency(unittest.TestCase):
         )
         return conn
     
+    def test_connection(self):
+        self.reset_database()
+        conn = self.connect()
+        cur = conn.cursor()
+        cur.execute("SELECT 0")
+        conn.close()
+
     def test_concurrent_connections(self):
         self.reset_database()
         import threading

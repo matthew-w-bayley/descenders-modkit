@@ -1,8 +1,12 @@
 {
     "python.analysis.extraPaths": [
-        "${workspaceFolder}/src"
-    ], // we're using 'common' for global stuff
-    "python.autoComplete.extraPaths": [
-        "${workspaceFolder}/../common"
+        "./src",
+        "./src/websocket-api",
+        "./src/web-api"
     ],
+    "python.testing.pytestArgs": [
+        "./tests"
+    ],
+    "python.testing.pytestEnabled": true,
+    "python.envFile": "${workspaceFolder}/.env"
 }
