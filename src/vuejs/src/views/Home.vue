@@ -148,7 +148,7 @@
               color="blue"
               href="">
               <v-card-title>
-                {{ total_stored_times }}
+                {{ numberWithCommas(total_stored_times) }}
               </v-card-title>
               <v-card-subtitle>
                 total stored times
