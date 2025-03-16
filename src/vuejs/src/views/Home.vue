@@ -119,7 +119,7 @@
               href="">
               <!-- Currently x users online, x times submitted in past 30 days -->
               <v-card-title>
-                {{  total_users_online }}
+                {{  numberWithCommas(total_users_online) }}
               </v-card-title>
               <v-card-subtitle>
                 Users Online
@@ -134,7 +134,7 @@
               href="">
               <!-- Currently x users online, x times submitted in past 30 days -->
               <v-card-title>
-                {{ times_submitted_past_30_days }} 
+                {{ numberWithCommas(times_submitted_past_30_days) }} 
               </v-card-title>
               <v-card-subtitle>
                 times in past 30 days
@@ -162,7 +162,7 @@
               color="blue"
               href="">
               <v-card-title>
-                {{  total_replay_size }}GB
+                {{  numberWithCommas(total_replay_size) }}GB
               </v-card-title>
               <v-card-subtitle>
                 of stored replays
@@ -229,6 +229,12 @@
           'identifier': ident
         }));
       })
+    },
+    methods: {
+      numberWithCommas(x) {
+        // taken diligently from https://stackoverflow.com/questions/2901102/how-to-format-a-number-with-commas-as-thousands-separators
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      }
     }
   }
 </script>
