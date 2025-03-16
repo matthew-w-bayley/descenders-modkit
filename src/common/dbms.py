@@ -345,11 +345,13 @@ class DBMS:
             result = await session.execute(
                 select(func.max(PlayerTime.starting_speed))
                 .join(Trail, Trail.trail_id == PlayerTime.trail_id)
+                .join(Verification, Verification.player_time_id == PlayerTime.player_time_id)
                 .where(
                     Trail.trail_name == trail_name,
                     Trail.world_name == world_name,
                     PlayerTime.starting_speed != 0,
                     PlayerTime.deleted.is_(False),
+                    Verification.verified.is_(True)
                 )
             )
             avg_speed = result.scalar_one_or_none()
