@@ -5,7 +5,8 @@
         "./src/web-api"
     ],
     "python.testing.pytestArgs": [
-        "./tests"
+        "./tests",
+        "-s"
     ],
     "python.testing.pytestEnabled": true,
     "python.envFile": "${workspaceFolder}/.env"

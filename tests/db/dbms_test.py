@@ -238,7 +238,7 @@ class TestDbms(unittest.IsolatedAsyncioTestCase):
             cur.execute(f"INSERT INTO checkpoint_times (player_time_id, checkpoint_num, checkpoint_time) VALUES ({i + 1}, 1, {random.randint(0, 30)})")
             cur.execute(f"INSERT INTO verifications (player_time_id, verified) VALUES ({i + 1}, TRUE)")
         conn.commit()
-        leaderboard = await dbms_instance.get_leaderboard("Test Trail", "Test World", num=50)
+        leaderboard = await dbms_instance.get_leaderboard("Test Trail", "Test World", limit=50)
         self.assertEqual(len(leaderboard), 50)
         # check to see if leaderboard is in order
         self.assertTrue(all(leaderboard[i]["time"] <= leaderboard[i + 1]["time"] for i in range(len(leaderboard) - 1)))
