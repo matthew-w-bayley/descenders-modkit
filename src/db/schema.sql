@@ -79,7 +79,7 @@ CREATE TABLE pending_items (
 --
 --)
 
-CREATE MATERIALIZED VIEW all_Times AS
+CREATE MATERIALIZED VIEW all_times AS
  WITH maxcheckpoints AS (
          SELECT DISTINCT ON (checkpoint_times_1.player_time_id) checkpoint_times_1.player_time_id,
             checkpoint_times_1.checkpoint_num AS max_checkpoint
