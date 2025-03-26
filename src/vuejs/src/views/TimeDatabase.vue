@@ -76,6 +76,7 @@ export default {
 
   methods: {
     async loadItems({ page, itemsPerPage, sortBy }) {
+      this.serverItems = [];
       // Cancel previous request if it exists
       if (this.abortController) {
         console.log("Aborting previous request...");
@@ -115,9 +116,9 @@ export default {
         sort_by: sortBy.length ? sortBy[0].key : '',
         order: sortBy.length ? (sortBy[0].order === 'desc' ? 'desc' : 'asc') : '',
       });
-
+      var apiUrl = "http://localhost:8082"
       console.log("API Call:", `${apiUrl}/get-all-times?${params.toString()}`);
-
+      
       const resp = await fetch(`${apiUrl}/get-total-stored-times`, { signal });
       const num_tot = await resp.json();
 
