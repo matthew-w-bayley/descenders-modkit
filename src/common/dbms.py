@@ -144,10 +144,9 @@ class DBMS:
     async def get_total_stored_times(self, timestamp: int = 0) -> int:
         async with self.async_session() as session:
             result = await session.execute(
-                select(AllTimes)
-                .where(AllTimes.submission_timestamp > timestamp)
+                select(func.count()).select_from(AllTimes).where(AllTimes.submission_timestamp > timestamp)
             )
-            return len(result.scalars().all())
+            return result.scalar_one()
 
     async def get_trails(self, only_populated = True) -> list[Trail]:
         async with self.async_session() as session:
