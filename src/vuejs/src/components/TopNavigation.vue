@@ -14,6 +14,7 @@
                 text
                 :to="route.path"
                 :key="route.name"
+                :disabled="route.name === 'Leaderboard'"
             >{{ route.name }}</v-btn>
             </template>
         </v-col>
@@ -51,6 +52,7 @@
                 link
             >
                 <v-list-item-title>{{ route.name }}</v-list-item-title>
+                
             </v-list-item>
         </v-list>
     </v-navigation-drawer>
