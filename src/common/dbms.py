@@ -64,19 +64,22 @@ class DBMS:
             result = await session.execute(select(Player))
             return result.scalars().all()
 
-    async def get_trail_id(self, trail_name, world_name):
+    async def get_trail_id(self, trail_name, world_name, world_version):
         async with self.async_session() as session:
             result = await session.execute(
                 select(Trail).filter_by(
                     trail_name=trail_name,
-                    world_name=world_name)
+                    world_name=world_name,
+                    version=world_version
                 )
+            )
             trail = result.scalar_one_or_none()
             # If trail does not exist, create it
             if trail is None:
                 trail = Trail(
                     trail_name=trail_name,
-                    world_name=world_name
+                    world_name=world_name,
+                    version=world_version
                 )
                 session.add(trail)
                 await session.commit()
@@ -105,11 +108,13 @@ class DBMS:
         if auto_verify:
             await self.submit_time_verification(player_time_id, 0, True)
         async with self.async_session() as session:
+            world_version = current_world.split('-')[1]
+            world_name = current_world.split('-')[0]
             new_time = PlayerTime(
                 player_time_id=player_time_id,
                 steam_id=steam_id,
                 submission_timestamp=time.time(),
-                trail_id=await self.get_trail_id(trail_name, current_world),
+                trail_id=await self.get_trail_id(trail_name, world_name, world_version),
                 bike_id=bike_id,
                 starting_speed=starting_speed,
                 version=version,
