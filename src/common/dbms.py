@@ -195,7 +195,7 @@ class DBMS:
                     (AT.final_time == subquery.c.min_final_time)
                 )
                 .filter_by(trail_name=trail_name, world_name=world_name)
-                .filter(AllTimes.deleted == False, AllTimes.verified == verified)
+                .filter(AT.deleted == False, AT.verified == verified)
                 .order_by(AT.final_time)
                 .limit(num)
             )
