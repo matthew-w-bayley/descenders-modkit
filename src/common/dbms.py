@@ -173,7 +173,7 @@ class DBMS:
         async with self.async_session() as session:
             # subquery to get the lowest final_time for each steam_id
             subquery = (
-                session.query(
+                select(
                     AllTimes.steam_id,
                     func.min(AllTimes.final_time).label("min_final_time")
                 )
