@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker, aliased
 from sqlalchemy.sql import func
 from sqlalchemy.future import select
+from sqlalchemy import text
 import time
 from common.dbms_models import (
     Player, PlayerTime, CheckpointTime, Trail,
@@ -129,7 +130,7 @@ class DBMS:
             await session.commit()
         # update materialized view 'all_times'
         async with self.async_session() as session:
-            await session.execute('REFRESH MATERIALIZED VIEW all_times')
+            await session.execute(text('REFRESH MATERIALIZED VIEW all_times'))
             await session.commit()
         return player_time_id
 
