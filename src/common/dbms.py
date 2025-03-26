@@ -127,6 +127,10 @@ class DBMS:
                 session.add(split)
 
             await session.commit()
+        # update materialized view 'all_times'
+        async with self.async_session() as session:
+            await session.execute('REFRESH MATERIALIZED VIEW all_times')
+            await session.commit()
         return player_time_id
 
     async def get_total_stored_times(self, timestamp: int = 0) -> int:
