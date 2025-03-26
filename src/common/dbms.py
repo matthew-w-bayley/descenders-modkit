@@ -4,11 +4,13 @@ from sqlalchemy.orm import sessionmaker, aliased
 from sqlalchemy.sql import func
 from sqlalchemy.future import select
 from sqlalchemy import text
+from better_profanity import profanity
 import time
 from common.dbms_models import (
     Player, PlayerTime, CheckpointTime, Trail,
     Verification, WebsiteUser, PendingItems, AllTimes
 )
+profanity.load_censor_words()
 
 
 # Database Management System
@@ -43,7 +45,7 @@ class DBMS:
         async with self.async_session() as session:
             player = await session.get(Player, steam_id)
             if player:
-                player.steam_name = steam_name
+                player.steam_name = profanity.censor(steam_name)
             else:
                 player = Player(steam_id=steam_id, steam_name=steam_name)
                 session.add(player)
@@ -210,7 +212,7 @@ class DBMS:
                 {
                     "place": i + 1,
                     "starting_speed": all_times.starting_speed,
-                    "name": (await self.get_player(all_times.steam_id)),
+                    "name": profanity.censor((await self.get_player(all_times.steam_id))),
                     "bike": all_times.bike_id,
                     "version": all_times.version,
                     "verified":all_times.verified,
