@@ -188,7 +188,7 @@ class DBMS:
             AT = aliased(AllTimes)
 
             query = (
-                session.query(AT)
+                select(AT)
                 .join(
                     subquery,
                     (AT.steam_id == subquery.c.steam_id) &
