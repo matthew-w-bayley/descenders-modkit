@@ -143,8 +143,11 @@ class DBMS:
 
     async def get_total_stored_times(self, timestamp: int = 0) -> int:
         async with self.async_session() as session:
+            query = select(func.count()).select_from(AllTimes)
+            if timestamp != 0:
+                query = query.where(AllTimes.submission_timestamp > timestamp)
             result = await session.execute(
-                select(func.count()).select_from(AllTimes).where(AllTimes.submission_timestamp > timestamp)
+                query
             )
             return result.scalar_one()
 
