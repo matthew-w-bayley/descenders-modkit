@@ -171,23 +171,30 @@ class DBMS:
             verified=True
         ) -> list[dict]:
         async with self.async_session() as session:
-            query = (
-                select(AllTimes)
-                # not deleted, verified
-                .filter_by(
-                    deleted=False,
-                    verified=verified,
+            # subquery to get the lowest final_time for each steam_id
+            subquery = (
+                session.query(
+                    AllTimes.steam_id,
+                    func.min(AllTimes.final_time).label("min_final_time")
                 )
-                # join with trail so we can verify trail
                 .join(Trail, Trail.trail_id == AllTimes.trail_id)
-                # and with our specific trail
-                .filter_by(
-                    trail_name = trail_name,
-                    world_name = world_name
+                .filter_by(trail_name=trail_name, world_name=world_name)
+                .filter(AllTimes.deleted == False, AllTimes.verified == verified)
+                .group_by(AllTimes.steam_id)
+                .subquery()
+            )
+
+            # Alias AllTimes to join with the subquery
+            AT = aliased(AllTimes)
+
+            query = (
+                session.query(AT)
+                .join(
+                    subquery,
+                    (AT.steam_id == subquery.c.steam_id) &
+                    (AT.final_time == subquery.c.min_final_time)
                 )
-                # order by the final time
-                .order_by(AllTimes.final_time)
-                # limit by num
+                .order_by(AT.final_time)
                 .limit(num)
             )
             result = await session.execute(query)
