@@ -14,7 +14,6 @@
                 text
                 :to="route.path"
                 :key="route.name"
-                :disabled="route.name === 'Leaderboard'"
             >{{ route.name }}</v-btn>
             </template>
         </v-col>
