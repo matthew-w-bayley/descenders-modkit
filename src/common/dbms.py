@@ -173,12 +173,15 @@ class DBMS:
         async with self.async_session() as session:
             query = (
                 select(AllTimes)
-                # join with trail so we can verify trail
-                .join(Trail, Trail.trail_id == AllTimes.trail_id)
-                # not deleted, verified, and with our specific trail
+                # not deleted, verified
                 .filter_by(
                     deleted=False,
                     verified=verified,
+                )
+                # join with trail so we can verify trail
+                .join(Trail, Trail.trail_id == AllTimes.trail_id)
+                # and with our specific trail
+                .filter_by(
                     trail_name = trail_name,
                     world_name = world_name
                 )
