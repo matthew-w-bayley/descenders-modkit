@@ -256,7 +256,7 @@ class WebSocket():
                 }
                 for leaderboard in await self.dbms.get_leaderboard(
                     trail_name,
-                    self.info.world_name
+                    self.info.world_name.split('-')[0]
                 )
             ]
         )
