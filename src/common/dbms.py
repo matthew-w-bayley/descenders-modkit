@@ -304,9 +304,16 @@ class DBMS:
             result = await session.execute(query)
             return [time for time in result.scalars().all()]
 
-    async def get_recent_times(self, page=1, itemsPerPage=10, sortBy="submission_timestamp", sortDesc=False):
+    async def get_recent_times(self, page=1, itemsPerPage=10, sortBy="submission_timestamp", sortDesc=False, search=None):
         async with self.async_session() as session:
             query = select(AllTimes)
+            if search:
+                from sqlalchemy import or_, String
+                query = query.where(AllTimes.steam_name.ilike(f"%{search}%"))
+
+            count_query = select(func.count()).select_from(query.subquery())
+            result_count = (await session.execute(count_query)).scalar()
+
             # TODO: This should be a dictionary
             if sortBy == "submission_timestamp":
                 query = query.order_by(AllTimes.submission_timestamp.desc() if sortDesc else AllTimes.submission_timestamp)
@@ -325,7 +332,7 @@ class DBMS:
                 query = query.limit(itemsPerPage).offset((page - 1) * itemsPerPage)
             result = await session.execute(query)
             times = result.scalars().all()
-            return [
+            return ([
                 {
                     "starting_speed": all_times.starting_speed,
                     "name": await self.get_player(all_times.steam_id),
@@ -338,7 +345,7 @@ class DBMS:
                     "submission_timestamp": all_times.submission_timestamp
                 }
                 for all_times in times
-            ]
+            ], result_count)
 
     async def get_trail_max_starting_speed(self, trail_name, world_name):
         async with self.async_session() as session:

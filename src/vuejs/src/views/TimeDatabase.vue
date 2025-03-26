@@ -1,13 +1,23 @@
 <template>
   <v-container fluid width="100%"
   height="90%">
-
+    <!-- search bar -->
+    <v-text-field
+      v-model="search"
+      append-icon="mdi-magnify"
+      label="Search"
+      single-line
+      hide-details
+      clearable
+      class="justify-center"
+    ></v-text-field>
   <v-container
     width="100%"
     height="80vh"
     class="d-flex justify-center d-sm-flex"
   >      
-
+      
+      <!-- table -->
       <v-data-table-server
           width="100%"
           height="100%"
@@ -54,7 +64,7 @@
 <script>
 export default {
   data: () => ({
-    itemsPerPage: 10,
+    itemsPerPage: 50,
     sortBy: [{ key: 'submission_timestamp', order: 'desc' }],
     headers: [
       { title: 'Player Name', key: 'name', align: 'start' },
@@ -97,6 +107,7 @@ export default {
         if (!signal.aborted) {
           this.serverItems = items;
           this.totalItems = total;
+          this.loading = false;
         }
       } catch (error) {
         if (error.name === "AbortError") {
@@ -105,7 +116,8 @@ export default {
           console.error("Error fetching data:", error);
         }
       } finally {
-        this.loading = false;
+        // we want to be stuck on loading if we failed to fetch data
+        //this.loading = false;
       }
     },
 
@@ -115,19 +127,20 @@ export default {
         items_per_page: itemsPerPage,
         sort_by: sortBy.length ? sortBy[0].key : '',
         order: sortBy.length ? (sortBy[0].order === 'desc' ? 'desc' : 'asc') : '',
+        search: this.search ? this.search : '',
       });
       var apiUrl = "http://localhost:8082"
       console.log("API Call:", `${apiUrl}/get-all-times?${params.toString()}`);
-      
-      const resp = await fetch(`${apiUrl}/get-total-stored-times`, { signal });
-      const num_tot = await resp.json();
 
       const response = await fetch(`${apiUrl}/get-all-times?${params.toString()}`, { signal });
       const data = await response.json();
+      const num_tot = data['num_times'];
+      const times = data['times'];
+      console.log(data);
 
       console.log("Fetched items:", data.length);
 
-      return { items: data, total: num_tot };
+      return { items: times, total: num_tot };
     },
 
     secs_to_str(secs) {
