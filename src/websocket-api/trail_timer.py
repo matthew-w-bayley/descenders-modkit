@@ -293,7 +293,7 @@ class TrailTimer():
                         f" Please only do this if you know your run is valid. ID{time_id}"
                     )
             )
-        else:
+        elif not self.timer_info.auto_verify:
             await self.network_player.send_popup("Verification Required",
                     (
                         f"Time cannot be verified due to the following reason: {can_end[1]}."
