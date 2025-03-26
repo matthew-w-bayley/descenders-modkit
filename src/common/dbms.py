@@ -165,39 +165,30 @@ class DBMS:
 
     async def get_leaderboard(
             self,
-            trail_name = None,
-            world_name = None,
+            trail_name,
+            world_name,
             num=10,
             verified=True
         ) -> list[dict]:
         async with self.async_session() as session:
             query = (
-                select(AllTimes)  # Select all columns from the AllTimes model
-                .distinct(AllTimes.trail_id, AllTimes.steam_id)  # group by (trail_id, steam_id)
-                .filter_by(deleted=False, verified=verified) # don't include deleted times
-                .order_by(  # required for DISTINCT ON to work correctly
-                    AllTimes.trail_id,  # Order by trail_id first
-                    AllTimes.steam_id,  # Then order by steam_id
-                    AllTimes.final_time  # order by final_time for smallest final_time
+                select(AllTimes)
+                # join with trail so we can verify trail
+                .join(Trail, Trail.trail_id == AllTimes.trail_id)
+                # not deleted, verified, and with our specific trail
+                .filter_by(
+                    deleted=False,
+                    verified=verified,
+                    trail_name = trail_name,
+                    world_name = world_name
                 )
+                # order by the final time
+                .order_by(AllTimes.final_time)
+                # limit by num
+                .limit(num)
             )
-            # if we have a trail name then discriminate to that trail
-            if trail_name is not None and world_name is not None:
-                query = (query
-                    .join(Trail, Trail.trail_id == AllTimes.trail_id)
-                    .filter(
-                        Trail.trail_name == trail_name
-                        and Trail.world_name == world_name
-                    )
-                )
-            query = query.order_by(AllTimes.final_time)
-            # if we want to limit then limit
-            if num:
-                query = query.limit(num)
             result = await session.execute(query)
             times = result.scalars().all()
-            # order times by final time
-            times = sorted(times, key=lambda x: x.final_time)
             return [
                 {
                     "place": i + 1,
