@@ -1,13 +1,16 @@
 """ Database Management System (DBMS) for managing data using SQLAlchemy. """
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, aliased
 from sqlalchemy.sql import func
 from sqlalchemy.future import select
+from sqlalchemy import text
+from better_profanity import profanity
 import time
 from common.dbms_models import (
     Player, PlayerTime, CheckpointTime, Trail,
     Verification, WebsiteUser, PendingItems, AllTimes
 )
+profanity.load_censor_words()
 
 
 # Database Management System
@@ -42,7 +45,7 @@ class DBMS:
         async with self.async_session() as session:
             player = await session.get(Player, steam_id)
             if player:
-                player.steam_name = steam_name
+                player.steam_name = profanity.censor(steam_name)
             else:
                 player = Player(steam_id=steam_id, steam_name=steam_name)
                 session.add(player)
@@ -63,19 +66,22 @@ class DBMS:
             result = await session.execute(select(Player))
             return result.scalars().all()
 
-    async def get_trail_id(self, trail_name, world_name):
+    async def get_trail_id(self, trail_name, world_name, world_version):
         async with self.async_session() as session:
             result = await session.execute(
                 select(Trail).filter_by(
                     trail_name=trail_name,
-                    world_name=world_name)
+                    world_name=world_name,
+                    version=world_version
                 )
+            )
             trail = result.scalar_one_or_none()
             # If trail does not exist, create it
             if trail is None:
                 trail = Trail(
                     trail_name=trail_name,
-                    world_name=world_name
+                    world_name=world_name,
+                    version=world_version
                 )
                 session.add(trail)
                 await session.commit()
@@ -104,11 +110,13 @@ class DBMS:
         if auto_verify:
             await self.submit_time_verification(player_time_id, 0, True)
         async with self.async_session() as session:
+            world_version = current_world.split('-')[1]
+            world_name = current_world.split('-')[0]
             new_time = PlayerTime(
                 player_time_id=player_time_id,
                 steam_id=steam_id,
                 submission_timestamp=time.time(),
-                trail_id=await self.get_trail_id(trail_name, current_world),
+                trail_id=await self.get_trail_id(trail_name, world_name, world_version),
                 bike_id=bike_id,
                 starting_speed=starting_speed,
                 version=version,
@@ -127,15 +135,21 @@ class DBMS:
                 session.add(split)
 
             await session.commit()
+        # update materialized view 'all_times'
+        async with self.async_session() as session:
+            await session.execute(text('REFRESH MATERIALIZED VIEW all_times'))
+            await session.commit()
         return player_time_id
 
     async def get_total_stored_times(self, timestamp: int = 0) -> int:
         async with self.async_session() as session:
+            query = select(func.count()).select_from(AllTimes)
+            if timestamp != 0:
+                query = query.where(AllTimes.submission_timestamp > timestamp)
             result = await session.execute(
-                select(AllTimes)
-                .where(AllTimes.submission_timestamp > timestamp)
+                query
             )
-            return len(result.scalars().all())
+            return result.scalar_one()
 
     async def get_trails(self, only_populated = True) -> list[Trail]:
         async with self.async_session() as session:
@@ -161,44 +175,46 @@ class DBMS:
 
     async def get_leaderboard(
             self,
-            trail_name = None,
-            world_name = None,
+            trail_name,
+            world_name,
             num=10,
             verified=True
         ) -> list[dict]:
         async with self.async_session() as session:
-            query = (
-                select(AllTimes)  # Select all columns from the AllTimes model
-                .distinct(AllTimes.trail_id, AllTimes.steam_id)  # group by (trail_id, steam_id)
-                .filter_by(deleted=False, verified=verified) # don't include deleted times
-                .order_by(  # required for DISTINCT ON to work correctly
-                    AllTimes.trail_id,  # Order by trail_id first
-                    AllTimes.steam_id,  # Then order by steam_id
-                    AllTimes.final_time  # order by final_time for smallest final_time
+            # subquery to get the lowest final_time for each steam_id
+            subquery = (
+                select(
+                    AllTimes.steam_id,
+                    func.min(AllTimes.final_time).label("min_final_time")
                 )
+                .join(Trail, Trail.trail_id == AllTimes.trail_id)
+                .filter_by(trail_name=trail_name, world_name=world_name)
+                .filter(AllTimes.deleted == False, AllTimes.verified == verified)
+                .group_by(AllTimes.steam_id)
+                .subquery()
             )
-            # if we have a trail name then discriminate to that trail
-            if trail_name is not None and world_name is not None:
-                query = (query
-                    .join(Trail, Trail.trail_id == AllTimes.trail_id)
-                    .filter(
-                        Trail.trail_name == trail_name
-                        and Trail.world_name == world_name
-                    )
+
+            # Alias AllTimes to join with the subquery
+            AT = aliased(AllTimes)
+
+            query = (
+                select(AT)
+                .join(
+                    subquery,
+                    (AT.steam_id == subquery.c.steam_id) &
+                    (AT.final_time == subquery.c.min_final_time)
                 )
-            query = query.order_by(AllTimes.final_time)
-            # if we want to limit then limit
-            if num:
-                query = query.limit(num)
+                .filter(AT.deleted == False, AT.verified == verified)
+                .order_by(AT.final_time)
+                .limit(num)
+            )
             result = await session.execute(query)
             times = result.scalars().all()
-            # order times by final time
-            times = sorted(times, key=lambda x: x.final_time)
             return [
                 {
                     "place": i + 1,
                     "starting_speed": all_times.starting_speed,
-                    "name": (await self.get_player(all_times.steam_id)),
+                    "name": profanity.censor((await self.get_player(all_times.steam_id))),
                     "bike": all_times.bike_id,
                     "version": all_times.version,
                     "verified":all_times.verified,
@@ -304,9 +320,16 @@ class DBMS:
             result = await session.execute(query)
             return [time for time in result.scalars().all()]
 
-    async def get_recent_times(self, page=1, itemsPerPage=10, sortBy="submission_timestamp", sortDesc=False):
+    async def get_recent_times(self, page=1, itemsPerPage=10, sortBy="submission_timestamp", sortDesc=False, search=None):
         async with self.async_session() as session:
             query = select(AllTimes)
+            if search:
+                from sqlalchemy import or_, String
+                query = query.where(AllTimes.steam_name.ilike(f"%{search}%"))
+
+            count_query = select(func.count()).select_from(query.subquery())
+            result_count = (await session.execute(count_query)).scalar()
+
             # TODO: This should be a dictionary
             if sortBy == "submission_timestamp":
                 query = query.order_by(AllTimes.submission_timestamp.desc() if sortDesc else AllTimes.submission_timestamp)
@@ -325,7 +348,7 @@ class DBMS:
                 query = query.limit(itemsPerPage).offset((page - 1) * itemsPerPage)
             result = await session.execute(query)
             times = result.scalars().all()
-            return [
+            return ([
                 {
                     "starting_speed": all_times.starting_speed,
                     "name": await self.get_player(all_times.steam_id),
@@ -338,7 +361,7 @@ class DBMS:
                     "submission_timestamp": all_times.submission_timestamp
                 }
                 for all_times in times
-            ]
+            ], result_count)
 
     async def get_trail_max_starting_speed(self, trail_name, world_name):
         async with self.async_session() as session:

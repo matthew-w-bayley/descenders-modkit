@@ -51,6 +51,7 @@
                 link
             >
                 <v-list-item-title>{{ route.name }}</v-list-item-title>
+                
             </v-list-item>
         </v-list>
     </v-navigation-drawer>

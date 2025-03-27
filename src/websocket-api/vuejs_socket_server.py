@@ -1,4 +1,5 @@
 import asyncio
+from better_profanity import profanity
 from common.dbms import DBMS
 from websocket import WebSocket
 import time
@@ -7,6 +8,7 @@ from aiohttp import web
 import json
 import requests
 import os
+profanity.load_censor_words()
 
 DISCORD_API_URL = "https://discord.com/api/users/@me"
 
@@ -103,7 +105,7 @@ class VuejsSocketServer:
         if data == 'get_users':
             users = [{
                 "steam_id": player.info.steam_id,
-                "steam_name": player.info.steam_name,
+                "steam_name": profanity.censor(player.info.steam_name),
                 "reputation": player.info.reputation,
                 "bike_type": player.info.bike_type,
                 "world_name": player.info.world_name,

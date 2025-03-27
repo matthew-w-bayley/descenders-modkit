@@ -284,7 +284,14 @@ class TrailTimer():
                 logging.error(f"Failed to send message to twitch chat: {e}")
         asyncio.create_task(twitch_notif())
 
-        if can_end[0]:
+        if not can_end[0]:
+            await self.network_player.send_popup("Time Invalid",
+                    (
+                        f"Time cannot be verified due to the following reason: {can_end[1]}."
+                        " You cannot ask us to verify this run."
+                    )
+            )
+        elif not self.timer_info.auto_verify:
             await self.network_player.send_popup("Verification Required",
                     (
                         f"Your time of {secs_str} can be verified if it is a legal run with no cuts."
@@ -293,13 +300,7 @@ class TrailTimer():
                         f" Please only do this if you know your run is valid. ID{time_id}"
                     )
             )
-        else:
-            await self.network_player.send_popup("Verification Required",
-                    (
-                        f"Time cannot be verified due to the following reason: {can_end[1]}."
-                        " You cannot ask us to verify this run."
-                    )
-            )
+
         if can_end[0]:
             await self.network_player.send(
                 f"TIMER_FINISH|{secs_str}\\n{comment}"

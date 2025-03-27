@@ -77,6 +77,7 @@ class AllTimes(Base):
     final_time = Column(Float, nullable=False)
     verified = Column(Boolean, nullable=False, default=False)
     verifier_id = Column(Integer, ForeignKey('users.user_id'), nullable=True)  # Adjust ForeignKey table if necessary
+    steam_name = Column(String, nullable=False)
 
 class PendingItems(Base):
     __tablename__ = 'pending_items'

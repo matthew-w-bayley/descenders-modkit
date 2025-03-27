@@ -57,3 +57,4 @@ yarl==1.12.0
 python-dotenv==1.0.1
 hypercorn==0.17.3
 python-socketio==5.12.1
+better-profanity==0.7.0

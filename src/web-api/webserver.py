@@ -188,9 +188,14 @@ class Webserver():
         page = int(request.args.get("page"))
         items_per_page = int(request.args.get("items_per_page"))
         sort_by = request.args.get("sort_by")
-        order = request.args.get("order")        
+        order = request.args.get("order")
+        search = request.args.get("search")
+        times = await self.dbms.get_recent_times(
+            page, items_per_page, sort_by, order == "desc", search
+        )
         return jsonify(
-            await self.dbms.get_recent_times(
-                page, items_per_page, sort_by, order == "desc"
-            )
+            {
+                "times": times[0],
+                "num_times": times[1]
+            }
         )

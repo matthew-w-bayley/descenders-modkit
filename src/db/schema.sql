@@ -79,7 +79,7 @@ CREATE TABLE pending_items (
 --
 --)
 
-CREATE VIEW all_Times AS
+CREATE MATERIALIZED VIEW all_times AS
  WITH maxcheckpoints AS (
          SELECT DISTINCT ON (checkpoint_times_1.player_time_id) checkpoint_times_1.player_time_id,
             checkpoint_times_1.checkpoint_num AS max_checkpoint
@@ -97,8 +97,10 @@ CREATE VIEW all_Times AS
     player_times.deleted,
     checkpoint_times.checkpoint_time AS final_time,
     COALESCE(verifications.verified, false) AS verified,
-    verifications.verifier_id
+    verifications.verifier_id,
+    players.steam_name
    FROM checkpoint_times
      JOIN maxcheckpoints ON checkpoint_times.player_time_id = maxcheckpoints.player_time_id AND checkpoint_times.checkpoint_num = maxcheckpoints.max_checkpoint
      JOIN player_times ON player_times.player_time_id = checkpoint_times.player_time_id
-     LEFT JOIN verifications ON verifications.player_time_id = checkpoint_times.player_time_id;
+     LEFT JOIN verifications ON verifications.player_time_id = checkpoint_times.player_time_id
+     JOIN players ON player_times.steam_id = players.steam_id;
