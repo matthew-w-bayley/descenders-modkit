@@ -2,7 +2,7 @@
   <v-container>
     <v-card class="pa-4">
       <v-card-title class="text-h5">Terms of Service</v-card-title>
-      <v-card-subtitle>Last Updated: Saturday 15th March 2025</v-card-subtitle>
+      <v-card-subtitle>Last Updated: 27th March 2025</v-card-subtitle>
       <v-divider class="mb-4"></v-divider>
       <v-scroll-y-transition>
         <v-card-text>
