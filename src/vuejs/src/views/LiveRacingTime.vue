@@ -2,7 +2,7 @@
     <v-container fluid class="fill-height">
       <v-row align="center" justify="center">
         <v-col cols="auto">
-          <h1 class="text-h3 tag-format">{{secs_to_str(user_time)}}</h1>
+          <h1 class="text-h3 tag-format" v-if="user_time != null">{{secs_to_str(user_time)}}</h1>
         </v-col>
       </v-row>
     </v-container>
@@ -85,15 +85,19 @@
         // get the latest trail
         var latest_trail = this.get_latest_trail;
         if (latest_trail === undefined){
-          this.user_time =  "Loading...";
+          this.user_time =  null;
+        }
+        // if latest_trail.started doesn't exist
+        else if (latest_trail.started == null){
+          this.user_time = null;
         }
         // if the trail is not started but times is not empty
-        if (latest_trail.started === false && latest_trail.times.length > 0){
+        else if (latest_trail.started === false && latest_trail.times.length > 0){
           // get the last time
           this.user_time =  latest_trail.times[latest_trail.times.length - 1];
         }
         // if the trail is started
-        if (latest_trail.started === true){
+        else if (latest_trail.started === true){
           // get the time since the trail started
           this.user_time = (Date.now()/1000) - latest_trail.time_started;
         }
