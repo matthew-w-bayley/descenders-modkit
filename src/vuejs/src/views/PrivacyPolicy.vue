@@ -9,7 +9,7 @@
           <h3 class="text-h6">1. Information We Collect</h3>
           <p>The Application collects the following types of data:</p>
           <ul>
-            <li>System information (hardware specs, operating system details)</li>
+            <li>System information (hardware specs, operating system details, public ip)</li>
             <li>Player information (steam id, guid)</li>
             <li>Replay files (files located in the replays folder of Descenders)</li>
             <li>Game performance metrics</li>
