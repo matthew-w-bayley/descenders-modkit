@@ -33,7 +33,7 @@ const token = localStorage.getItem("discord_token");
 const REDIRECT_URI = encodeURIComponent("https://modkit.nohumanman.com/callback");
 router.beforeEach((to, from, next) => {
   if (to.path === '/live-racing' && !token) {
-    next();//window.location.href = `https://discord.com/api/oauth2/authorize?client_id=973689949020880926&redirect_uri=${REDIRECT_URI}&response_type=token&scope=identify`;
+    window.location.href = `https://discord.com/api/oauth2/authorize?client_id=973689949020880926&redirect_uri=${REDIRECT_URI}&response_type=token&scope=identify`;
   } else {
     next();
   }
