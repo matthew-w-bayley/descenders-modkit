@@ -35,6 +35,16 @@
           <v-divider class="my-3"></v-divider>
           <h3 class="text-h6">5. Governing Law</h3>
           <p>These Terms shall be governed by and interpreted in accordance with the laws of the United Kingdom of Great Britain and Northern Ireland.</p>
+
+          <h3 class="text-h6">6. Enforcement & Penalties</h3>
+          <p>The developers and authorized users reserve the right to take action against users who violate these Terms.</p>
+          <p>This includes, but is not limited to:</p>
+          <ul>
+            <li>Banning users from using the Application.</li>
+            <li>Removing or modifying leaderboard times for any reason (particularly if unfair advantages, exploits, or cheating are detected).</li>
+            <li>Closing or forcefully terminating the game session (particularly if unauthorized modifications or exploits are detected).</li>
+          </ul>
+          <p>Decisions regarding enforcement are final and made at the discretion of any users authorized by developers.</p>
         </v-card-text>
       </v-scroll-y-transition>
     </v-card>
