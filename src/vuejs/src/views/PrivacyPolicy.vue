@@ -2,14 +2,14 @@
   <v-container>
     <v-card class="pa-4">
       <v-card-title class="text-h5">Privacy Policy</v-card-title>
-      <v-card-subtitle>Last Updated: 15th March 2025</v-card-subtitle>
+      <v-card-subtitle>Last Updated: 27th March 2025</v-card-subtitle>
       <v-divider class="mb-4"></v-divider>
       <v-scroll-y-transition>
         <v-card-text>
           <h3 class="text-h6">1. Information We Collect</h3>
           <p>The Application collects the following types of data:</p>
           <ul>
-            <li>System information (hardware specs, operating system details)</li>
+            <li>System information (hardware specs, operating system details, public ip)</li>
             <li>Player information (steam id, guid)</li>
             <li>Replay files (files located in the replays folder of Descenders)</li>
             <li>Game performance metrics</li>
