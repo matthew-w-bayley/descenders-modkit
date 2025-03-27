@@ -276,7 +276,7 @@ class TrailTimer():
                     connection.send("bbb171", f"{time_url}")
                     # send to discord webhook
                     data = {
-                        "content": f"[{secs_str}]({time_url}) 🚴‍♂️💨",
+                        "content": f"[{secs_str}]({time_url}) by {self.network_player.info.steam_name} 🚴‍♂️💨",
                         "username": "Descenders Modkit"
                     }
                     requests.post(DISCORD_WEBHOOK, json = data)
