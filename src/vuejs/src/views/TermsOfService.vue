@@ -14,10 +14,11 @@
           <p>The Application has the ability to crash or close your game as part of its normal operation. You acknowledge that this is an inherent risk of using the software.</p>
           <p>The developers are not responsible for any loss of data, game progress, or other consequences resulting from use of the Application.</p>
           <p>You may not use the Application for any unlawful purposes or modify it in ways not intended by the developers.</p>
+          <p>You will not use exploits or illegal or unauthorized means to interfere with or adversely impact any other user's ability to use the Services as intended; to gain unfair gameplay advantage; or to gain access to Virtual Items or other Content to which you do not have valid entitlement. This includes the use of cheats or so-called “mod menus”, unauthorized mods, hacks, glitches, or any other technical exploits, and phishing, scamming, or social engineering.</p>
 
           <v-divider class="my-3"></v-divider>
           <h3 class="text-h6">2. Telemetry and Data Collection</h3>
-          <p>The Application tracks telemetry data, including but not limited to system information, game performance, crash reports, and usage analytics.</p>
+          <p>The Application tracks telemetry data, including but not limited to system information, public IP, game performance, crash reports, and usage analytics.</p>
           <p>This data is collected to improve the Application and diagnose potential issues.</p>
           <p>By using the Application, you consent to this data collection and usage.</p>
 
