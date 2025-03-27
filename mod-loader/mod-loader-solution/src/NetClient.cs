@@ -187,6 +187,11 @@ namespace ModLoaderSolution
 		public void UploadReplay(string replay, string time_id)
 		{
 			Byte[] bytes = System.IO.File.ReadAllBytes(replay);
+			if (bytes.Length == 0)
+			{
+				Utilities.instance.PopUp("Replay failed to upload!", "Time will be invalidated...");
+				return;
+			}
 			string base64Replay = Convert.ToBase64String(bytes);
 
 			string message = $"UPLOAD_REPLAY|{time_id}|{base64Replay}\n";
