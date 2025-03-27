@@ -134,10 +134,13 @@ class WebSocket():
             if missing_padding:
                 base64_replay += '=' * (4 - missing_padding)
             replay_file.write(base64.b64decode(base64_replay))
-        logging.info(
-            "%s '%s'\t- replay uploaded successfully",
-            self.info.steam_id, self.info.steam_name
-        )
+        # verify path contains a replay of significant size
+        if os.path.getsize(replay_path) > 10:
+            print("Replay failed to upload!", time_id)
+            # delete
+            os.remove(replay_path)
+            # try again
+            await self.send(f"UPLOAD_REPLAY|{time_id}")
 
     async def send_leaderboard(self, trail_name: str):
         """ Send the leaderboard data for a specific trail to the descenders unity client """
