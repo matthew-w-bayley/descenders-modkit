@@ -135,7 +135,7 @@ class WebSocket():
                 base64_replay += '=' * (4 - missing_padding)
             replay_file.write(base64.b64decode(base64_replay))
         # verify path contains a replay of significant size
-        if os.path.getsize(replay_path) > 10:
+        if os.path.getsize(replay_path) < 10:
             print("Replay failed to upload!", time_id)
             # delete
             os.remove(replay_path)
