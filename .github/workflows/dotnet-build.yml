@@ -10,8 +10,6 @@ on:
       - 'mod-loader/mod-loader-solution/*'
   pull_request:
     branches: [ "main", "dev" ]
-    paths:
-      - 'mod-loader/mod-loader-solution/*'
 
 jobs:
   build:
