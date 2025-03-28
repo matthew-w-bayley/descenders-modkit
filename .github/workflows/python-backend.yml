@@ -70,6 +70,6 @@ jobs:
 
       - name: Lint schema.sql
         run: |
-          python -m sqlfluff lint --dialect postgres server/src/database-schema/schema.sql
+          python -m sqlfluff lint --dialect postgres src/db/schema.sql
 
       
