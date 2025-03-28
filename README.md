@@ -1,10 +1,10 @@
 # Descenders Modkit
 
-[![Release ModLoaderSolution](https://github.com/nohumanman/descenders-modkit/actions/workflows/dotnet-release.yml/badge.svg)](https://github.com/nohumanman/descenders-modkit/actions/workflows/dotnet-release.yml)
+[![Release ModLoaderSolution](https://github.com/matthew-w-bayley/descenders-modkit/actions/workflows/dotnet-release.yml/badge.svg)](https://github.com/matthew-w-bayley/descenders-modkit/actions/workflows/dotnet-release.yml)
 [![License: GPL v3][gpg-license-svg-url]][gpg-license-url]
 
-[python-application-svg-url]: https://github.com/nohumanman/descenders-modkit/actions/workflows/python-app.yml/badge.svg 
-[python-application-url]: https://github.com/nohumanman/descenders-modkit/actions/workflows/python-app.yml/badge.svg 
+[python-application-svg-url]: https://github.com/matthew-w-bayley/descenders-modkit/actions/workflows/python-app.yml/badge.svg 
+[python-application-url]: https://github.com/matthew-w-bayley/descenders-modkit/actions/workflows/python-app.yml/badge.svg 
 [gpg-license-svg-url]: https://img.shields.io/badge/License-GPLv3-blue.svg
 [gpg-license-url]: https://www.gnu.org/licenses/gpl-3.0
 

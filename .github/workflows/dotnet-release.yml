@@ -55,7 +55,7 @@ jobs:
 
       - name: Push to nohumanman.com
         run: |
-          url="https://api.github.com/repos/nohumanman/descenders-modkit/commits/main"
+          url="https://api.github.com/repos/matthew-w-bayley/descenders-modkit/commits/main"
           response=$(curl -s -H "Accept: application/vnd.github.v3+json" $url)
           commit_hash=$(echo $response | jq -r '.sha')
           mv ${{ github.workspace }}/static/ModLoaderSolutionFiles/ModLoaderSolution.bin ${{ github.workspace }}/static/ModLoaderSolution.bin
@@ -66,5 +66,5 @@ jobs:
           git commit -m "Update ModLoaderSolution from $commit_hash"
           git push origin main
           # notify discord server
-          json='{"username": "Descenders Modkit", "content": "The modkit client file has updated to a new version!\nhttps://github.com/nohumanman/descenders-modkit/commit/'"$commit_hash"'"}'
+          json='{"username": "Descenders Modkit", "content": "The modkit client file has updated to a new version!\nhttps://github.com/matthew-w-bayley/descenders-modkit/commit/'"$commit_hash"'"}'
           curl -H "Content-Type: application/json" -d "$json" ${{ secrets.DISCORD_WEBHOOK }}
