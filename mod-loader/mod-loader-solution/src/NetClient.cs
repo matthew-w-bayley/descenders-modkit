@@ -335,6 +335,10 @@ namespace ModLoaderSolution
 					}
 				}
 			}
+			if (message.StartsWith("TOGGLE_OFFLINE_MODE"))
+			{
+                DevCommandsNetwork.ToggleOffline();
+            }
 			if (message.StartsWith("TIMER_FINISH"))
 			{
 				string[] leaderboard = message.Split('|');
