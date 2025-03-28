@@ -40,6 +40,18 @@ class WebSocketServer():
                     self.delete_player(player)
             await asyncio.sleep(1)
 
+    async def send_riders_gate(self):
+        """ Sends the RIDERSGATE message to all players """
+        while True:
+            for player in self.players:
+                if player.alive:  # Ensure the player is still connected
+                    try:
+                        await player.send("RIDERSGATE|5")
+                    except (asyncio.TimeoutError, ConnectionResetError, BrokenPipeError):
+                        print(f"Failed to send RIDERSGATE to {player}, removing player.")
+                        self.delete_player(player)
+            await asyncio.sleep(15)
+
     async def handle_client(self, reader: StreamReader, writer: StreamWriter):
         """ Creates a client from their socket and address """        
         address = writer.get_extra_info('peername')
