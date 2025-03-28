@@ -55,9 +55,7 @@ jobs:
           python -m pip install pylint
 
       - name: Run unit tests
-        run: |
-          export PYTHONPATH=$PYTHONPATH:$(pwd)/src/websocket-api:$(pwd)/src/web-api
-          python -m unittest discover -s ./tests -p "*_test.py"
+        run: python -m unittest discover -s ./tests -p "*_test.py" -v
 
       - name: Lint python code (pylint)
         run: |
