@@ -11,7 +11,7 @@ on:
       - main
     # and if mod-loader-solution is changed at all
     paths:
-      - 'mod-loader/mod-loader-solution/*'
+      - 'mod-loader/mod-loader-solution/**'
 jobs:
   build:
     runs-on: windows-2019
