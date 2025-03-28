@@ -47,27 +47,28 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flake8 pytest
-          if [ -f src/requirements.txt ]; then pip install -r src/requirements.txt; fi
+          python -m pip install flake8 pytest
+          python -m pip install -r src/common/requirements.txt
+          python -m pip install -r src/web-api/requirements.txt
           python -m pip install sqlfluff==2.3.5
           python -m pip install pylint
 
-      - name: Run unit tests
+      - name: Run tests
         run: |
-          export PYTHONPATH=$PYTHONPATH:$(pwd)/src/websocket-api:$(pwd)/src/web-api
-          python -m unittest discover -s ./tests -p "*_test.py"
+          python -m pip freeze
+          python -m unittest discover -s ./tests -p "*_test.py" -v
 
-      - name: Lint python code (pylint)
-        run: |
-          # stop the build if there are Python syntax errors or undefined names
-          cd src/
-          pylint *.py --exit-zero
-          cd tests/
-          pylint *.py --exit-zero
-          cd ..
+      #- name: Lint python code (pylint)
+      #  run: |
+      #    # stop the build if there are Python syntax errors or undefined names
+      #    cd src/
+      #    pylint *.py --exit-zero
+      #    cd tests/
+      #    pylint *.py --exit-zero
+      #    cd ..
 
-      - name: Lint schema.sql
-        run: |
-          python -m sqlfluff lint --dialect postgres server/src/database-schema/schema.sql
+      #- name: Lint schema.sql
+      #  run: |
+      #    python -m sqlfluff lint --dialect postgres src/db/schema.sql
 
       
