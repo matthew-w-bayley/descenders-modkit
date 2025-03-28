@@ -1,8 +1,0 @@
-{
-    "python.analysis.extraPaths": [
-        "${workspaceFolder}/src"
-    ], // we're using 'common' for global stuff
-    "python.autoComplete.extraPaths": [
-        "${workspaceFolder}/../common"
-    ],
-}
