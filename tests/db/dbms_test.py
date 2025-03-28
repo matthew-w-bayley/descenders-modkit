@@ -17,6 +17,11 @@ Start database with:
     cd server/src/database-schema/
     docker-compose up -d
 '''
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src/')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src/common/')))
+
 import unittest
 import time
 from dbms import DBMS

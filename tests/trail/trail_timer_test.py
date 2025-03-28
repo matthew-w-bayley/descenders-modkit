@@ -1,6 +1,11 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src/')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src/websocket-api/')))
+
+from trail_timer import TrailTimer
 import unittest
 from unittest.mock import AsyncMock
-from trail_timer import TrailTimer
 import asyncio
 import time
 
