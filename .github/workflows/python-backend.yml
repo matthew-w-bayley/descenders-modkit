@@ -48,7 +48,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install flake8 pytest
-          if [ -f src/requirements.txt ]; then pip install -r src/requirements.txt; fi
+          if [ -f src/common/requirements.txt ]; then pip install -r src/common/requirements.txt; fi
+          if [ -f src/web-api/requirements.txt ]; then pip install -r src/web-api/requirements.txt; fi
+          if [ -f src/websocket-api/requirements.txt ]; then pip install -r src/websocket-api/requirements.txt; fi
           python -m pip install sqlfluff==2.3.5
           python -m pip install pylint
 
