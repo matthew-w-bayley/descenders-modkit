@@ -25,7 +25,8 @@ namespace ModLoaderSolution
 		Coroutine gateTriggerCoroutine = null;
 		public void ToggleGate()
         {
-			StopCoroutine(gateTriggerCoroutine);
+			if (gateTriggerCoroutine != null)
+				StopCoroutine(gateTriggerCoroutine);
 			GetComponent<AudioSource>().Stop();
 			GetComponent<Animator>().StopPlayback();
 			if (gateEnabled)
