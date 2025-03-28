@@ -5,7 +5,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../.
 
 import unittest
 from unittest.mock import AsyncMock, patch
-from discord.ext import commands
 from discord_bot import DiscordBot
 from discord_bot import posh_time
 

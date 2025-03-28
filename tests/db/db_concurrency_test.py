@@ -1,7 +1,6 @@
 '''
 Module to test database concurrency of postgresql.
 '''
-
 import unittest
 import time
 
@@ -12,7 +11,7 @@ class TestConcurrency(unittest.TestCase):
         conn = self.connect()
         cur = conn.cursor()
         cur.execute(drop_all)
-        with open('./server/src/database-schema/schema.sql') as f:
+        with open('./src/db/schema.sql') as f:
             schema = f.read()
             cur.execute(schema)
         conn.commit()

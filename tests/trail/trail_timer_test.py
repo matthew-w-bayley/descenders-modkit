@@ -9,6 +9,8 @@ from unittest.mock import AsyncMock
 import asyncio
 import time
 
+
+
 # pylint: disable=missing-function-docstring, no-member, attribute-defined-outside-init, line-too-long, protected-access
 
 class TestTrailTimer(unittest.IsolatedAsyncioTestCase):
