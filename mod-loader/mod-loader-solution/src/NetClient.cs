@@ -25,9 +25,9 @@ namespace ModLoaderSolution
 		List<string> messages = new List<string>();
 		public int port = 65433;
 		public string ip = "86.26.185.112";
-		static string version = "0.4.05";
+		static string version = "0.4.06";
 		static bool quietUpdate = false;
-		static string patchNotes = "This version contains a hotfix for replays failing to upload. Some previous times may not be verifiable due to this error. Hopefully this bug is resolved.\n\n\nYours,\n- nohumanman"; // that which has changed since the last version.
+		static string patchNotes = "- Live racing gates now open #502\n\n\nYours,\n- nohumanman"; // that which has changed since the last version.
 		public static DebugType debugState = DebugType.RELEASE;
         [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeAnalysis", "IDE0051:Unused member", Justification = "Called by Unity DI")]
         void Awake(){
