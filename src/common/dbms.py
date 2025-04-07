@@ -248,7 +248,8 @@ class DBMS:
                 "submission_timestamp": time.submission_timestamp,
                 "time": time.final_time,
                 "verified": time.verified,
-                "deleted": time.deleted
+                "deleted": time.deleted,
+                "world_name": (await session.get(Trail, time.trail_id).world_name)
             }
 
     async def submit_time_verification(
