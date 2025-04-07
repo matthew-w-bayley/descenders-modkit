@@ -249,7 +249,7 @@ class DBMS:
                 "time": time.final_time,
                 "verified": time.verified,
                 "deleted": time.deleted,
-                "world_name": (await session.get(Trail, time.trail_id).world_name)
+                "world_name": ((await session.get(Trail, time.trail_id)).world_name)
             }
 
     async def submit_time_verification(
