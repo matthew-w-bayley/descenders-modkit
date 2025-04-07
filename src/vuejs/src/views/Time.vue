@@ -45,6 +45,13 @@
                 <v-icon start>mdi-bike</v-icon>
                 {{ timeInfo.bike == 0 ? 'Enduro' : timeInfo.bike == 1 ? 'Downhill' : 'Hardtail' }}
             </v-chip>
+            <v-chip
+                :color="timeInfo.replay_exists ? 'green' : 'red'"
+                outlined
+            >
+                <v-icon start>{{ timeInfo.replay_exists ? 'mdi-check' : 'mdi-close' }}</v-icon>
+                Replay exists
+            </v-chip>
             <v-chip>
                 <v-icon start>mdi-speedometer</v-icon>
                 {{ Math.round(timeInfo.starting_speed) }}m/s

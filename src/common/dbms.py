@@ -249,8 +249,15 @@ class DBMS:
                 "time": time.final_time,
                 "verified": time.verified,
                 "deleted": time.deleted,
-                "world_name": ((await session.get(Trail, time.trail_id)).world_name)
+                "world_name": ((await session.get(Trail, time.trail_id)).world_name),
+                "replay_exists": await self.replay_exists(time_id)
             }
+
+    async def replay_exists(self, time_id):
+        from os.path import exists
+        # ./replays/{time_id}.replay
+        replay_path = f"./replays/{time_id}.replay"
+        return exists(replay_path)
 
     async def submit_time_verification(
             self,
