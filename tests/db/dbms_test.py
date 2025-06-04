@@ -359,7 +359,6 @@ class TestDbms(unittest.IsolatedAsyncioTestCase):
         self.assertEqual((await dbms_instance.get_discord_user(123456789)).steam_id, "76561198000000000")
         self.assertEqual((await dbms_instance.get_discord_user(123456789)).authorised, True)
 
-    @unittest.skip("not yet implemented")
     async def test_get_personal_best_checkpoint_times(self):
         dbms_instance = await self.get_dbms_instance()
         # manually insert because submit_time uses time.time() which is not deterministic
@@ -372,11 +371,13 @@ class TestDbms(unittest.IsolatedAsyncioTestCase):
         cur.execute("INSERT INTO checkpoint_times (player_time_id, checkpoint_num, checkpoint_time) VALUES (1, 2, 2)")
         cur.execute("INSERT INTO checkpoint_times (player_time_id, checkpoint_num, checkpoint_time) VALUES (1, 3, 3)")
         cur.execute("INSERT INTO checkpoint_times (player_time_id, checkpoint_num, checkpoint_time) VALUES (1, 4, 4)")
+        # verify the time
+        cur.execute("INSERT INTO verifications (player_time_id, verified) VALUES (1, TRUE)")
+        cur.execute("REFRESH MATERIALIZED VIEW all_times")
         conn.commit()
         personal_best_checkpoint_times = await dbms_instance.get_personal_best_checkpoint_times("Test Trail", "Test World", "76561198000000000")
         self.assertEqual(personal_best_checkpoint_times, [1, 2, 3, 4])
-    
-    @unittest.skip("not yet implemented")
+
     async def test_get_personal_best_checkpoint_times_with_multiple_times(self):
         dbms_instance = await self.get_dbms_instance()
         # manually insert because submit_time uses time.time() which is not deterministic
@@ -394,11 +395,13 @@ class TestDbms(unittest.IsolatedAsyncioTestCase):
         cur.execute("INSERT INTO checkpoint_times (player_time_id, checkpoint_num, checkpoint_time) VALUES (2, 2, 2)")
         cur.execute("INSERT INTO checkpoint_times (player_time_id, checkpoint_num, checkpoint_time) VALUES (2, 3, 3)")
         cur.execute("INSERT INTO checkpoint_times (player_time_id, checkpoint_num, checkpoint_time) VALUES (2, 4, 5)")
+        cur.execute("INSERT INTO verifications (player_time_id, verified) VALUES (1, TRUE)")
+        cur.execute("INSERT INTO verifications (player_time_id, verified) VALUES (2, TRUE)")
+        cur.execute("REFRESH MATERIALIZED VIEW all_times")
         conn.commit()
         personal_best_checkpoint_times = await dbms_instance.get_personal_best_checkpoint_times("Test Trail", "Test World", "76561198000000000")
         self.assertEqual(personal_best_checkpoint_times, [1, 2, 3, 4])
-    
-    @unittest.skip("not yet implemented")
+
     async def test_get_personal_best_checkpoint_times_with_unverified_time(self):
         dbms_instance = await self.get_dbms_instance()
         # manually insert because submit_time uses time.time() which is not deterministic
@@ -412,11 +415,11 @@ class TestDbms(unittest.IsolatedAsyncioTestCase):
         cur.execute("INSERT INTO checkpoint_times (player_time_id, checkpoint_num, checkpoint_time) VALUES (1, 3, 3)")
         cur.execute("INSERT INTO checkpoint_times (player_time_id, checkpoint_num, checkpoint_time) VALUES (1, 4, 4)")
         cur.execute("INSERT INTO verifications (player_time_id, verified) VALUES (1, FALSE)")
+        cur.execute("REFRESH MATERIALIZED VIEW all_times")
         conn.commit()
         personal_best_checkpoint_times = await dbms_instance.get_personal_best_checkpoint_times("Test Trail", "Test World", "76561198000000000")
         self.assertEqual(personal_best_checkpoint_times, [])
-    
-    @unittest.skip("not yet implemented")
+
     async def test_get_personal_best_checkpoint_times_with_deleted_time(self):
         dbms_instance = await self.get_dbms_instance()
         # manually insert because submit_time uses time.time() which is not deterministic
@@ -429,11 +432,11 @@ class TestDbms(unittest.IsolatedAsyncioTestCase):
         cur.execute("INSERT INTO checkpoint_times (player_time_id, checkpoint_num, checkpoint_time) VALUES (1, 2, 2)")
         cur.execute("INSERT INTO checkpoint_times (player_time_id, checkpoint_num, checkpoint_time) VALUES (1, 3, 3)")
         cur.execute("INSERT INTO checkpoint_times (player_time_id, checkpoint_num, checkpoint_time) VALUES (1, 4, 4)")
+        cur.execute("REFRESH MATERIALIZED VIEW all_times")
         conn.commit()
         personal_best_checkpoint_times = await dbms_instance.get_personal_best_checkpoint_times("Test Trail", "Test World", "76561198000000000")
         self.assertEqual(personal_best_checkpoint_times, [])
-    
-    @unittest.skip("not yet implemented")
+
     async def test_get_global_best_checkpoint_times(self):
         dbms_instance = await self.get_dbms_instance()
         # manually insert because submit_time uses time.time() which is not deterministic
@@ -452,11 +455,11 @@ class TestDbms(unittest.IsolatedAsyncioTestCase):
         cur.execute("INSERT INTO checkpoint_times (player_time_id, checkpoint_num, checkpoint_time) VALUES (1, 4, 4)")
         # insert verification
         cur.execute("INSERT INTO verifications (player_time_id, verified) VALUES (1, TRUE)")
+        cur.execute("REFRESH MATERIALIZED VIEW all_times")
         conn.commit()
         global_best_checkpoint_times = await dbms_instance.get_global_best_checkpoint_times("Test Trail", "Test World")
         self.assertEqual(global_best_checkpoint_times, [1, 2, 3, 4])
-    
-    @unittest.skip("not yet implemented")
+
     async def test_get_global_best_checkpoint_times_with_multiple_times(self):
         dbms_instance = await self.get_dbms_instance()
         # manually insert because submit_time uses time.time() which is not deterministic
@@ -486,6 +489,7 @@ class TestDbms(unittest.IsolatedAsyncioTestCase):
         cur.execute("INSERT INTO checkpoint_times (player_time_id, checkpoint_num, checkpoint_time) VALUES (2, 4, 5)")
         # insert verification
         cur.execute("INSERT INTO verifications (player_time_id, verified) VALUES (2, TRUE)")
+        cur.execute("REFRESH MATERIALIZED VIEW all_times")
         conn.commit()
         global_best_checkpoint_times = await dbms_instance.get_global_best_checkpoint_times("Test Trail", "Test World")
         self.assertEqual(global_best_checkpoint_times, [1, 2, 3, 4])
