@@ -115,23 +115,24 @@ class TrailTimer():
                 self.network_player.info.world_name
             )
             pb = await self.network_player.dbms.get_personal_best_checkpoint_times(
-                self.trail_name, self.network_player.info.steam_id,
-                self.network_player.info.world_name
+                self.trail_name,
+                self.network_player.info.world_name,
+                self.network_player.info.steam_id
             )
 
             total_checkpoints = self.timer_info.total_checkpoints - 1
             index = len(self.timer_info.times) - 1
             if wr is not None and total_checkpoints == len(wr):
-                time_diff = wr[index] - float(client_time)
+                wr_diff = wr[index] - float(client_time)
             else:
-                time_diff = None
+                wr_diff = None
 
             if pb is not None and total_checkpoints == len(pb):
-                time_diff_local = pb[index] - float(client_time)
+                pb_diff = pb[index] - float(client_time)
             else:
-                time_diff_local = None
+                pb_diff = None
 
-            mess = self.calculate_split_message(time_diff, time_diff_local, client_time)
+            mess = self.calculate_split_message(wr_diff, pb_diff, client_time)
             await self.network_player.send(f"SPLIT_TIME|{mess}")
 
     def calculate_split_message(self, time_diff: float, time_diff_local: float, client_time: float) -> str:
