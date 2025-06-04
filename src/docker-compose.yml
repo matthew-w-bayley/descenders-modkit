@@ -28,6 +28,7 @@ services:
       - postgres
     volumes:
       - ./replays:/app/replays
+      - ./trails:/app/trails
     env_file:
       - path: .env.private-tokens
   
@@ -43,6 +44,7 @@ services:
       - postgres
     volumes:
       - ./replays:/app/replays
+      - ./trails:/app/trails
     env_file:
       - path: .env.private-tokens
 
