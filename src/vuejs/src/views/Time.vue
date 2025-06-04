@@ -1,16 +1,21 @@
 <template>
-    <Beta />
     <v-container justify="center">
-    <v-card v-if="timeInfo != null">
+    <v-alert
+        border="left"
+        color="red"
+        type="error"
+        v-if="timeInfo.name == null"
+    >This time could not be found in the database!</v-alert>
+    <v-card>
         <v-card-title class="text-center">
             <h2>{{ secs_to_str(timeInfo.time) }}</h2>
             <h3>{{ timeInfo.name }}</h3>
         </v-card-title>
         <v-card-subtitle class="text-center">
             Time ID: {{ timeInfo.time_id }}
-            <v-btn @click="navigator.clipboard.writeText(timeInfo.time_id);" size="x-small" icon>
-                <v-icon>mdi-content-copy</v-icon>
-            </v-btn>
+        </v-card-subtitle>
+        <v-card-subtitle  class="text-center">
+            World Name: {{ timeInfo.world_name }}
         </v-card-subtitle>
         <v-card-subtitle class="text-center">
             Submitted: {{ new Date(timeInfo.submission_timestamp * 1000).toLocaleString() }}
@@ -40,6 +45,13 @@
                 <v-icon start>mdi-bike</v-icon>
                 {{ timeInfo.bike == 0 ? 'Enduro' : timeInfo.bike == 1 ? 'Downhill' : 'Hardtail' }}
             </v-chip>
+            <v-chip
+                :color="timeInfo.replay_exists ? 'green' : 'red'"
+                outlined
+            >
+                <v-icon start>{{ timeInfo.replay_exists ? 'mdi-check' : 'mdi-close' }}</v-icon>
+                Replay exists
+            </v-chip>
             <v-chip>
                 <v-icon start>mdi-speedometer</v-icon>
                 {{ Math.round(timeInfo.starting_speed) }}m/s
@@ -50,42 +62,6 @@
             </v-chip>
         </v-card-actions>
         <v-divider class="my-4"></v-divider>
-        <!-- Image carousel of the invalid parts -->
-        <v-btn
-            width="100%"
-            flat
-            @click="show = !show"
-        >Invalid Parts<v-icon :icon="show ? 'mdi-chevron-up' : 'mdi-chevron-down'"></v-icon></v-btn>
-        <v-expand-transition>
-            <div v-show="show">
-                <Beta />
-                <v-container max-width="400">
-                In the future, below will contain images where the user went off-track, for now, please enjoy pictures of cats because this feature isn't a priority
-                </v-container>
-                <v-carousel>
-                <v-carousel-item
-                    v-for="(image, i) in catImages"
-                    :key="i"
-                >
-                    <v-img
-                    :src="image"
-                    aspect-ratio="1"
-                    contain
-                    ></v-img>
-                </v-carousel-item>
-                </v-carousel>
-            </div>
-        </v-expand-transition>
-        <v-btn
-            width="100%"
-            flat
-            @click="show2 = !show2"
-        >Split Times<v-icon :icon="show2 ? 'mdi-chevron-up' : 'mdi-chevron-down'"></v-icon></v-btn>
-        <v-expand-transition>
-            <div v-show="show">
-                <Beta />
-            </div>
-        </v-expand-transition>
         <v-card-actions>
           <!-- report button on top right-->
           <v-btn disabled @click="report = !report" icon class="position-absolute top-0 right-0" color="orange" v-bind="attrs" v-on="on"><v-icon>mdi-flag</v-icon></v-btn>
@@ -119,17 +95,8 @@
 <script>
     export default {
         data: () => ({
-            timeInfo: null,
+            timeInfo: {},
             report: false,
-            show: false,
-            show2: false,
-            catImages: [
-                "https://cdn2.thecatapi.com/images/1.jpg",
-                "https://cdn2.thecatapi.com/images/2.jpg",
-                "https://cdn2.thecatapi.com/images/3.jpg",
-                "https://cdn2.thecatapi.com/images/4.jpg",
-                "https://cdn2.thecatapi.com/images/5.jpg"
-            ]
         }),
         mounted() {
             this.$socket.emit("message", {"type": "get", "identifier": "time", "data": this.$route.params.time_id});

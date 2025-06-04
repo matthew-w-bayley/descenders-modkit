@@ -1,17 +1,6 @@
 <template>
   <v-container fluid width="100%"
   height="90%">
-      <!-- alert to say we've updated this part of the website-->
-      <v-alert
-        v-model="alert"
-        type="success"
-        dismissible
-        border="left"
-        elevation="2"
-        icon="mdi-check"
-      >
-        We've updated the time database! You should now be able to scroll across the database successfully and search for steam names.
-      </v-alert>
       <br>
     <!-- search bar -->
     <v-text-field
