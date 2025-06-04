@@ -289,8 +289,32 @@ class DBMS:
             session.add(user)
             await session.commit()
 
-    async def get_personal_best_checkpoint_times(self, steam_id, trail_name, world_name) -> list[float]|None:  
-        pass
+    async def get_personal_best_checkpoint_times(self, trail_name, world_name, steam_id) -> list[float]|None:  
+        async with self.async_session() as session:
+            query = (
+                select(AllTimes)
+                .join(Trail, Trail.trail_id == AllTimes.trail_id)
+                .filter(
+                    Trail.trail_name == trail_name,
+                    Trail.world_name == world_name,
+                    AllTimes.steam_id == steam_id,
+                    AllTimes.deleted.is_(False),
+                    AllTimes.verified
+                )
+                .order_by(AllTimes.final_time)
+                .limit(1)
+            )
+            result = await session.execute(query)
+            best_time = result.scalar_one_or_none()
+            if best_time is None:
+                return []
+            query = (
+                select(CheckpointTime.checkpoint_time)
+                .filter_by(player_time_id=best_time.player_time_id)
+                .order_by(CheckpointTime.checkpoint_num)
+            )
+            result = await session.execute(query)
+            return [time for time in result.scalars().all()]
 
     async def get_global_best_checkpoint_times(self, trail_name, world_name) -> list[float]|None:
         async with self.async_session() as session:
