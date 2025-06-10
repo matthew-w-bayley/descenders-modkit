@@ -45,7 +45,7 @@ pycparser==2.21
 python-decouple==3.8
 Quart==0.20.0
 quart-cors==0.8.0
-requests==2.32.0
+requests==2.32.4
 SQLAlchemy==2.0.37
 srcomapi==0.3.3
 twitch-chat-irc==0.0.4
