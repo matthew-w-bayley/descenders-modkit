@@ -24,7 +24,7 @@ namespace ModLoaderSolution
 		bool PlayerCollision = false;
 		List<string> messages = new List<string>();
 		public int port = 65433;
-		public string ip = "86.26.185.112";
+		public string ip = "81.129.220.241";
 		static string version = "0.4.06";
 		static bool quietUpdate = false;
 		static string patchNotes = "- Live racing gates now open #502\n\n\nYours,\n- nohumanman"; // that which has changed since the last version.
