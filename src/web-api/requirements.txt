@@ -50,7 +50,7 @@ SQLAlchemy==2.0.37
 srcomapi==0.3.3
 twitch-chat-irc==0.0.4
 typing_extensions==4.12.2
-urllib3==2.2.2
+urllib3==2.5.0
 Werkzeug==3.0.6
 wsproto==1.2.0
 yarl==1.12.0
