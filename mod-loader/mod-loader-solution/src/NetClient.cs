@@ -27,7 +27,7 @@ namespace ModLoaderSolution
 		public string ip = "81.106.47.230";
 		static string version = "0.4.07";
 		static bool quietUpdate = false;
-		static string patchNotes = "- Live racing gates now open #502\n\n\nYours,\n- nohumanman"; // that which has changed since the last version.
+		static string patchNotes = "- Fixed modkit downtime #502\n\n\nYours,\n- nohumanman"; // that which has changed since the last version.
 		public static DebugType debugState = DebugType.RELEASE;
         [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeAnalysis", "IDE0051:Unused member", Justification = "Called by Unity DI")]
         void Awake(){
