@@ -51,7 +51,7 @@ srcomapi==0.3.3
 twitch-chat-irc==0.0.4
 typing_extensions==4.12.2
 urllib3==2.2.2
-Werkzeug==3.0.6
+Werkzeug==3.1.5
 wsproto==1.2.0
 yarl==1.12.0
 python-dotenv==1.0.1
