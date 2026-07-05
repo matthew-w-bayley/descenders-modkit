@@ -1,41 +1,43 @@
-# This workflow will build a .NET project and push it to release
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
 name: Release ModLoaderSolution
 
 on:
   workflow_dispatch:
   push:
-    # release only if main 
     branches: 
       - main
-    # and if mod-loader-solution is changed at all
     paths:
       - 'mod-loader/mod-loader-solution/**'
+
 jobs:
   build:
-    runs-on: windows-2025
+    runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
       - name: Build Solution
         run: |
-           cd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\"
-           $warnings = .\MSBuild.exe $Env:GITHUB_WORKSPACE\mod-loader\mod-loader-solution\ModLoaderSolution.sln /p:WarningsAsErrors=false /p:WarningLevel=1  /nologo /v:q
-           if ($warnings -gt 0) { exit 1 }
-           mv $Env:GITHUB_WORKSPACE\mod-loader\mod-loader-solution\bin\Debug\ModLoaderSolution.dll $Env:GITHUB_WORKSPACE\ModLoaderSolution.bin
+          msbuild mod-loader/mod-loader-solution/ModLoaderSolution.sln /p:Configuration=Release /p:WarningsAsErrors=false /p:WarningLevel=1 /nologo /v:m
+          # Move the compiled output
+          $source = "$Env:GITHUB_WORKSPACE\mod-loader\mod-loader-solution\bin\Release\ModLoaderSolution.dll"
+          $dest = "$Env:GITHUB_WORKSPACE\ModLoaderSolution.bin"
+          Move-Item -Path $source -Destination $dest -Force
+
       - name: Upload solution
         uses: actions/upload-artifact@v4
         with:
           name: ModLoaderSolution
-          path: ${{ github.workspace }}/ModLoaderSolution.bin
+          path: ModLoaderSolution.bin
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: nohumanman/nohumanman.com
           ref: 'main'
@@ -45,7 +47,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Delete existing ModLoaderSolution
-        run: rm -r ${{ github.workspace }}/static/ModLoaderSolution.bin
+        run: rm -f ${{ github.workspace }}/static/ModLoaderSolution.bin
 
       - name: Download artifact
         uses: actions/download-artifact@v4
@@ -58,13 +60,16 @@ jobs:
           url="https://api.github.com/repos/matthew-w-bayley/descenders-modkit/commits/main"
           response=$(curl -s -H "Accept: application/vnd.github.v3+json" $url)
           commit_hash=$(echo $response | jq -r '.sha')
+          
           mv ${{ github.workspace }}/static/ModLoaderSolutionFiles/ModLoaderSolution.bin ${{ github.workspace }}/static/ModLoaderSolution.bin
-          rm -r ${{ github.workspace }}/static/ModLoaderSolutionFiles/
+          rm -rf ${{ github.workspace }}/static/ModLoaderSolutionFiles/
+          
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           git add .
           git commit -m "Update ModLoaderSolution from $commit_hash"
           git push origin main
+          
           # notify discord server
           json='{"username": "Descenders Modkit", "content": "The modkit client file has updated to a new version!\nhttps://github.com/matthew-w-bayley/descenders-modkit/commit/'"$commit_hash"'"}'
           curl -H "Content-Type: application/json" -d "$json" ${{ secrets.DISCORD_WEBHOOK }}
