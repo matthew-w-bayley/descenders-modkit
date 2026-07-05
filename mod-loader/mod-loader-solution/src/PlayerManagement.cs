@@ -26,23 +26,30 @@ namespace ModLoaderSolution
 				Instance = this; 
 		}
         [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeAnalysis", "IDE0051:Unused member", Justification = "Called by Unity DI")]
-        void Update()
-        {
-            string currentMap = Utilities.instance.GetCurrentMap();
-            // if we've switched maps
-            if (currentMap != prevMap)
-                OnMapEnter(currentMap);
-            // if human doesn't exist
-            if (PlayerHuman == null)
-                PlayerHuman = Utilities.GetPlayer();
-            // if we've just bailed
-            if (Utilities.instance.hasBailed() && !wasBailed)
-                OnRespawn();
-            wasBailed = Utilities.instance.hasBailed();
-            // if human exists
-            if (PlayerHuman != null)
-                CheckForRespawn(); // check if we've respawned
-        }
+		void Update()
+		{
+		    // Safety check for Utilities
+		    if (Utilities.instance == null) return;
+		
+		    string currentMap = Utilities.instance.GetCurrentMap();
+		    
+		    // Check if map changed, but also check if NetClient is ready
+		    if (currentMap != prevMap)
+		    {
+		        OnMapEnter(currentMap);
+		    }
+		
+		    if (PlayerHuman == null)
+		        PlayerHuman = Utilities.GetPlayer();
+		
+		    if (Utilities.instance.hasBailed() && !wasBailed)
+		        OnRespawn();
+		        
+		    wasBailed = Utilities.instance.hasBailed();
+		
+		    if (PlayerHuman != null)
+		        CheckForRespawn();
+		}
         public void NetStart(){
 			OnMapEnter(Utilities.instance.GetCurrentMap());
             OnBikeSwitch(BikeSwitcher.GetBike());
