@@ -24,7 +24,7 @@ namespace ModLoaderSolution
 		bool PlayerCollision = false;
 		List<string> messages = new List<string>();
 		public int port = 65433;
-		public string ip = "81.106.47.230";
+		public string ip = "achilles.nohumanman.com";
 		static string version = "0.4.07";
 		static bool quietUpdate = false;
 		static string patchNotes = "- Fixed modkit downtime #502\n\n\nYours,\n- nohumanman"; // that which has changed since the last version.
