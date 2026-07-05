@@ -556,22 +556,36 @@ namespace ModLoaderSolution
             _SendData(clientMessage);
         }
 		void _SendData(string clientMessage) {
-			if (!clientMessage.EndsWith("\n"))
-				clientMessage = clientMessage + "\n";
-            try
-            {
-                NetworkStream stream = socketConnection.GetStream();
-                if (stream.CanWrite)
-                {
-                    byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(clientMessage);
-                    stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);
-                    stream.Flush(); // Ensure data is flushed immediately
-                }
-            }
-            catch (SocketException socketException)
-            {
-                Utilities.Log("Socket exception: " + socketException);
-            }
+		    // 1. Guard clause: Ensure the connection actually exists and is active
+		    if (socketConnection == null || !socketConnection.Connected)
+		    {
+		        Utilities.Log("Attempted to send data, but socket is not connected.");
+		        return;
+		    }
+		
+		    if (!clientMessage.EndsWith("\n"))
+		        clientMessage = clientMessage + "\n";
+		
+		    try
+		    {
+		        // 2. Use the validated connection
+		        NetworkStream stream = socketConnection.GetStream();
+		        if (stream != null && stream.CanWrite)
+		        {
+		            byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(clientMessage);
+		            stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);
+		            stream.Flush();
+		        }
+		    }
+		    catch (Exception ex) 
+		    {
+		        // 3. Catch generic Exceptions (not just SocketException) 
+		        // to prevent thread crashes during IO failures
+		        Utilities.Log("Error in _SendData: " + ex.Message);
+		        
+		        // Optional: Trigger a reconnection if the send fails
+		        // ConnectToTcpServer(); 
+		    }
 		}
         public void OnDestroy()
 		{
