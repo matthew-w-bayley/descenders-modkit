@@ -27,7 +27,7 @@ future==0.18.3
 greenlet==3.1.1
 h11==0.16.0
 h2==4.2.0
-hpack==4.1.0
+hpack==4.2.0
 Hypercorn==0.17.3
 hyperframe==6.1.0
 idna==3.7
